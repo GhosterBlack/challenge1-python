@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import List, Dict, Union
 # constantes
 SELECT = "Seleccione una opcion: "
 BADOPTION = "Opcion incorrecta"
@@ -21,6 +20,22 @@ class Datos:
     experimentos = []
     usuario = -1
     
+    def iniciarSesion (self, correo, clave):
+        usuarios = self.usuarios
+        inited = False
+        for i in range(len(usuarios)):
+            usuario = usuarios[i]
+            if usuario['correo'] == correo:
+                if usuario['clave'] == clave:
+                    self.usuario = i
+                    inited = True
+        if inited:
+            return usuarios[self.usuario]
+    
+    def obtenerUsuario (self):
+        if self.usuario > -1:
+            return self.usuarios[self.usuario]
+
     def agregarUsuario (self, correo: str, clave: str, nombreArchivo: str, formatoArchivo: str, telefono: str, fecha: str, nombre: str, apellido: str):
         try: 
             usuario = {
@@ -211,6 +226,24 @@ def configuracion (usuario):
     
     return
 
+def main (data: Datos):
+    while True:
+        print("--------------------")
+        print("Menu principal")
+        print("1. Configuracion")
+        print("2. Salir")
+        print("--------------------")
+        respuesta = input(SELECT)
+        if respuesta == "1":
+            configuracion(data.obtenerUsuario())
+        elif respuesta == "2":
+            print("Saliendo del programa...")
+            data.guardar()
+            break
+        else:
+            print(BADOPTION)
+
+
 # trabaja aqui edi
 
 
@@ -276,22 +309,6 @@ def menuUsuario():
             print("Ingrese una opcion valida")
             return
 
-def main (data: Datos):
-    while True:
-        print("--------------------")
-        print("Menu principal")
-        print("1. Configuracion")
-        print("2. Salir")
-        print("--------------------")
-        respuesta = input(SELECT)
-        if respuesta == "1":
-            configuracion(data.usuarios[data.usuario])
-        elif respuesta == "2":
-            print("Saliendo del programa...")
-            data.guardar()
-            break
-        else:
-            print(BADOPTION)
 
 
 if __name__ == "__main__":
