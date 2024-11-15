@@ -151,10 +151,42 @@ def configuracion ():
 def menuUsuario():
     # vamos a abrir la base de datos
     datos = Datos()
-    # viejo a partir de ahora todos los print dentro de funciones
+     # viejo a partir de ahora todos los print dentro de funciones
     acceso = ['Registrarse','Iniciar sesion']
     # aqui van a estar todos los usuarios
     usuarios = datos.usuarios
+
+
+    def menuRegistrarse():
+        try:
+            # Pedimos los datos
+            print("Ingrese su nomnre:")
+            nombre = input()
+            print("Ingrese su apellido:")
+            apellido = input()
+            print("Correo electronico:")
+            correo = input()
+            print("Ingrese una clave:")
+            clave = input()
+            while (True):
+                if 8 <= len(clave) <=20:
+                    print("Confirme clave:")
+                    claveConfirmada = input()
+                    if claveConfirmada == clave:
+                        break
+                    else:
+                        print("Intente de nuevo")
+                else:
+                    print("Ingrese entre 8 y 20 caracteres")
+            # Guardanmos los datos
+            datos.agregarUsuario(correo, clave, "", "", "", "", nombre, apellido)
+            # Mensaje a usuario
+            print("Datos guardados exitosamente")
+        except ValueError:
+            print("No ingreso ningun dato.")
+        return
+   
+   
 
     print("Bienvenido a nuestro Asistente de Laboratorio")
     print("\nAcceso:")
@@ -166,44 +198,12 @@ def menuUsuario():
         opcion_Acceso = acceso[acceso_Seleccionado-1]
         # Aqui va el menu iniciar sesion
         if opcion_Acceso == 1:
-            def menuRegistrarse():
-            guardarDatos = Datos(usuarios)
-            try:
-                # Pedimos los datos
-                print("Ingrese su nomnre:")
-                nombre = input()
-                print("Ingrese su apellido:")
-                apellido = input()
-                print("Correo electronico:")
-                correo = input()
-                print("Ingrese una clave:")
-                clave = input()
-                while (True):
-                    if 8 <= len(clave) <=20:
-                        print("Confirme clave:")
-                        claveConfirmada = input()
-                        if claveConfirmada == clave:
-                            break
-                        else:
-                            print("Intente de nuevo")
-                    else:
-                        print("Ingrese entre 8 y 20 caracteres")
-                # Guardanmos los datos
-                nombre = guardarDatos.nombre
-                apellido = guardarDatos.apellido
-                correo = guardarDatos.correo
-                clave = guardarDatos.clave
-                # Mensaje a usuario
-                print("Datos guardados exitosamente")
-            except ValueError:
-                print("No ingreso ningun dato.")
-                return
-        if opcion_Acceso == 2:
-            def menuIniciarSesion():
-                        
-    else:
-        print("Ingrese una opcion valida")
-        return
+            menuRegistrarse()
+        elif opcion_Acceso == 2:
+            pass     
+        else:
+            print("Ingrese una opcion valida")
+            return
 
 def main ():
     while True:

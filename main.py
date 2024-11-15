@@ -1,13 +1,25 @@
 from datetime import datetime
+from typing import List, Dict, Union
 # constantes
 SELECT = "Seleccione una opcion: "
 BADOPTION = "Opcion incorrecta"
 BADINFOREQUEST = "! Datos ingresados no validos"
+FORMATOlETRAS = {
+    'N': "Nombre del experimento",
+    'F': "Fecha del experimento",
+    'T': "Tipo de experimento",
+    'R': "Resultados del experimento"
+}
 
+# edi cuando inicies sesion recuerda poner en la variable usuario de los datos el id del usuario que inicia sesion
+
+    
 # Declaramos una clase datos que sera usada por la funcion principal para controlar el archivo donde se guardan los datos
 class Datos:
+    
     usuarios = []
     experimentos = []
+    usuario = -1
     
     def agregarUsuario (self, correo: str, clave: str, nombreArchivo: str, formatoArchivo: str, telefono: str, fecha: str, nombre: str, apellido: str):
         try: 
@@ -115,9 +127,40 @@ class Datos:
                         self.experimentos.append(experimento)
 
 
-def configuracion ():
+def configuracion (usuario):
     def optionExport ():
-        pass
+        nombrePorDefecto = usuario['nombreArchivo']
+        formatoPorDefecto = usuario['formatoArchivo']
+        if nombrePorDefecto == "":
+            nombrePorDefecto = usuario['nombre'] + " " + usuario['telefono']
+        if formatoPorDefecto == "":
+            formatoPorDefecto = "N-F-T-R"
+        formato_split = formatoPorDefecto.split("-")
+        print(".: Configuracion de exportacion :.")
+        print(f"Nombre de archivo de exportacion: {nombrePorDefecto}")
+        print("Formato de exportacion, (orden de la informacion): ")
+        for i in range(len(formato_split)):
+            letra = formato_split[i]
+            print(f"{i+1}. {FORMATOlETRAS[letra]}")
+
+        print("Escriba el nombre de exportacion de su archivo, si no desea cambiarlo precione enter sin escribir nada")
+        respuesta = input(SELECT)
+        if respuesta != "":
+            usuario['nombreArchivo'] = respuesta
+        while True:
+            print("¿Desea cambiar el orden del formato?")
+            print("1. Si")
+            print("2. No")
+            respuesta = input(SELECT)
+            if respuesta == "1" or respuesta == "si" or respuesta == "Si" or respuesta == "SI":
+                pass
+            elif respuesta == "2" or respuesta == "no" or respuesta == "No" or respuesta == "NO":
+                break
+            else:
+                print(BADOPTION)
+        return
+
+
     def optionSecure ():
         pass
     def dataBaseRestore ():
@@ -163,7 +206,7 @@ def menuUsuario():
     if acceso_Seleccionado > 0 and acceso_Seleccionado <= len(acceso):
         opcion_Acceso = acceso[acceso_Seleccionado-1]
 
-def main ():
+def main (data: Datos):
     while True:
         print("--------------------")
         print("Menu principal")
@@ -175,6 +218,7 @@ def main ():
             configuracion()
         elif respuesta == "2":
             print("Saliendo del programa...")
+            data.guardar()
             break
         else:
             print(BADOPTION)
