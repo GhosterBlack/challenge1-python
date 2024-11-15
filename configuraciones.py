@@ -1,14 +1,20 @@
 from datetime import datetime
+# constantes
+SELECT = "Seleccione una opcion: "
+BADOPTION = "Opcion incorrecta"
+
 
 # Declaramos una clase datos que sera usada por la funcion principal para controlar el archivo donde se guardan los datos
 class Datos:
     usuarios = []
     experimentos = []
     
-    def agregarUsuario (self, correo: str, clave: str):
+    def agregarUsuario (self, correo: str, clave: str, nombreArchivo: str, formatoArchivo: str):
         usuario = {
             'correo': correo,
-            'clave': clave
+            'clave': clave,
+            'nombreArchivo': nombreArchivo,
+            'formatoArchivo': formatoArchivo
         }
         self.usuarios.append(usuario)
         print("*** Usuario agregado con exito ***")
@@ -38,7 +44,7 @@ class Datos:
         if len(self.usuarios) > 0:
             for i in range(len(self.usuarios)):
                 usuario = self.usuarios[i]
-                text += f"\n{usuario['correo']}@\n{usuario['clave']}"
+                text += f"\n{usuario['correo']}@\n{usuario['clave']}@\n{usuario['nombreArchivo']}@\n{usuario['formatoArchivo']}"
                 if i < len(self.usuarios)-1:
                     text += "\n----"
         else:
@@ -75,7 +81,9 @@ class Datos:
                     usuario_list = usuarios[i].split("@")
                     usuario = {
                         'correo': usuario_list[0],
-                        'clave': usuario_list[1]
+                        'clave': usuario_list[1],
+                        'nombreArchivo': usuario_list[2],
+                        'formatoArchivo': usuario_list[3]
                     }
                     if usuario['correo'] != "usuario":
                         self.usuarios.append(usuario)
@@ -95,20 +103,48 @@ class Datos:
                         self.experimentos.append(experimento)
 
 
+def configuracion ():
+    def optionExport ():
+        pass
+    def optionSecure ():
+        pass
+    def dataBaseRestore ():
+        pass
+    while True:
+        print("** Menu de configuracion **")
+        print("1. Opciones de exportacion")
+        print("2. Opciones de seguridad")
+        print("3. Restablecer base de datos")
+        print("4. Volver al menu principal")
+        respuesta = input(SELECT)
+        if respuesta == "1":
+            optionExport()
+        elif respuesta == "2":
+            optionSecure()
+        elif respuesta == "3":
+            dataBaseRestore()
+        elif respuesta == "4":
+            break
+        else:
+            print(BADOPTION)
+    
+    return
+
+
+
 def main ():
-    datos = Datos()
-    nombre = ""
-    clave = ""
-
-    print(datos.usuarios)
-
-    print("Por favor escriba su correo")
-    nombre = input("Correo: ")
-    print("Por favor dijite su clave")
-    clave = input("Clave: ")
-
-    datos.agregarUsuario(nombre, clave)
-    datos.guardar()
+    while True:
+        print("Menu principal")
+        print("1. Configuracion")
+        print("2. Salir")
+        respuesta = input(SELECT)
+        if respuesta == "1":
+            configuracion()
+        elif respuesta == "2":
+            print("Saliendo del programa...")
+            break
+        else:
+            print(BADOPTION)
 
 
 if __name__ == "__main__":

@@ -90,14 +90,9 @@ This is a repository for the challenge number one of dev senior python course
 ---
 
 ### Menú "Configuración"
-1. *Preferencias de Almacenamiento*
-   - Configura la ubicación de almacenamiento de la base de datos o archivos.
 
 2. *Opciones de Exportación*
-   - Configura las opciones de exportación (formato, nombre del archivo, ubicación).
-
-3. *Personalizar Interfaz*
-   - Permite modificar aspectos visuales de la interfaz (temas, colores).
+   - Configura las opciones de exportación (formato, nombre del archivo).
 
 4. *Opciones de Seguridad*
    - Configura opciones de autenticación, como contraseñas de usuario.
