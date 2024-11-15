@@ -166,7 +166,7 @@ def menuUsuario():
             apellido = input()
             print("Correo electronico:")
             correo = input()
-            
+
             while (True):
                 print("Ingrese una clave:")
                 clave = input()
@@ -179,15 +179,21 @@ def menuUsuario():
                         print("Intente de nuevo")
                 else:
                     print("Ingrese entre 8 y 20 caracteres")
+                    
             # Guardanmos los datos
-            datos.agregarUsuario(correo, clave, "", "", "", "", nombre, apellido)
+            datos.agregarUsuario(correo, clave, "", "", "", "1/1/24", nombre, apellido)
             # Mensaje a usuario
             print("Datos guardados exitosamente")
         except ValueError:
             print("No ingreso ningun dato.")
         return
    
-   
+    def menuIniciarSesion():
+        print("Ingrese su correo:")
+        correo_a_Verificar = input()
+        print("Ingrese su clave:")
+        clave_a_Verificar = input()
+        
 
     print("Bienvenido a nuestro Asistente de Laboratorio")
     print("\nAcceso:")
@@ -196,6 +202,7 @@ def menuUsuario():
 
     acceso_Seleccionado = int(input())
     if acceso_Seleccionado > 0 and acceso_Seleccionado <= len(acceso):
+
         if acceso_Seleccionado == 1:
             menuRegistrarse()
         elif acceso_Seleccionado == 2:
