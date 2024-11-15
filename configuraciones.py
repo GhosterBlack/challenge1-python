@@ -136,11 +136,11 @@ def configuracion ():
 
 def main ():
     while True:
-        print("###########################")
+        print("--------------------")
         print("Menu principal")
         print("1. Configuracion")
         print("2. Salir")
-        print("###########################")
+        print("--------------------")
         respuesta = input(SELECT)
         if respuesta == "1":
             configuracion()
