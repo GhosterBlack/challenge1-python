@@ -2,34 +2,42 @@ from datetime import datetime
 # constantes
 SELECT = "Seleccione una opcion: "
 BADOPTION = "Opcion incorrecta"
+BADINFOREQUEST = "! Datos ingresados no validos"
 
 # Declaramos una clase datos que sera usada por la funcion principal para controlar el archivo donde se guardan los datos
 class Datos:
     usuarios = []
     experimentos = []
     
-    def agregarUsuario (self, correo: str, clave: str, nombreArchivo: str, formatoArchivo: str):
-        usuario = {
-            'correo': correo,
-            'clave': clave,
-            'nombreArchivo': nombreArchivo,
-            'formatoArchivo': formatoArchivo
-        }
-        self.usuarios.append(usuario)
-        print("*** Usuario agregado con exito ***")
+    def agregarUsuario (self, correo: str, clave: str, nombreArchivo: str, formatoArchivo: str, telefono: str, fecha: str, nombre: str, apellido: str):
+        try: 
+            usuario = {
+                'correo': correo,
+                'clave': clave,
+                'nombreArchivo': nombreArchivo,
+                'formatoArchivo': formatoArchivo,
+                'telefono': telefono,
+                'fecha': datetime(fecha, "%d/%m/%Y"),
+                'nombre': nombre,
+                'apellido': apellido
+            }
+            self.usuarios.append(usuario)
+            print("*** Usuario agregado con exito ***")
+        except ValueError:
+            print(BADINFOREQUEST)
 
     def agregarExperimento (self, nombre:str, fecha:str, tipo, resultado):
         try:
             experimento = {
                 'nombre': nombre,
-                'fecha': datetime.strptime(fecha, "%d/%m/%Y"),
+                'fecha': fecha,
                 'tipo': tipo,
                 'resultado': resultado
             }
             self.experimentos.append(experimento)
             print("*** Experimento cargado con exito ***")
         except ValueError:
-            print("! Datos ingresados no validos")
+            print(BADINFOREQUEST)
         
     # el metodo guardar nos permite guardar la informacion ya establecida
     def guardar (self): 
@@ -44,6 +52,7 @@ class Datos:
             for i in range(len(self.usuarios)):
                 usuario = self.usuarios[i]
                 text += f"\n{usuario['correo']}@\n{usuario['clave']}@\n{usuario['nombreArchivo']}@\n{usuario['formatoArchivo']}"
+                text += f"\n@{usuario['telefono']}\n@{usuario['fecha']}\n@{usuario['nombre']}\n@{usuario['apellido']}"
                 if i < len(self.usuarios)-1:
                     text += "\n----"
         else:
@@ -82,7 +91,11 @@ class Datos:
                         'correo': usuario_list[0],
                         'clave': usuario_list[1],
                         'nombreArchivo': usuario_list[2],
-                        'formatoArchivo': usuario_list[3]
+                        'formatoArchivo': usuario_list[3],
+                        'telefono': usuario_list[4],
+                        'fecha': usuario_list[5],
+                        'nombre': usuario_list[6],
+                        'apellido': usuario_list[7]
                     }
                     if usuario['correo'] != "usuario":
                         self.usuarios.append(usuario)
@@ -95,11 +108,12 @@ class Datos:
                         experimento_list = experimentos[i].split("@")
                         experimento = {
                             'nombre': experimento_list[0],
-                            'fecha': datetime.strptime(experimento_list[1], "%d/%m/%Y"),
+                            'fecha': experimento_list[1],
                             'tipo': experimento_list[2],
                             'resultados': experimento_list[3]
                         }
                         self.experimentos.append(experimento)
+
 
 
 def configuracion ():
@@ -138,18 +152,58 @@ def menuUsuario():
     # vamos a abrir la base de datos
     datos = Datos()
     # viejo a partir de ahora todos los print dentro de funciones
-    acceso = ['Iniciar sesión', 'Registrarse']
+    acceso = ['Registrarse','Iniciar sesion']
     # aqui van a estar todos los usuarios
     usuarios = datos.usuarios
 
     print("Bienvenido a nuestro Asistente de Laboratorio")
     print("\nAcceso:")
     for i, opcion_Acceso in enumerate(acceso):
-        print(f"{i+1}: {acceso}")
+        print(f"{i+1}: {opcion_Acceso}")
 
     acceso_Seleccionado = int(input())
     if acceso_Seleccionado > 0 and acceso_Seleccionado <= len(acceso):
         opcion_Acceso = acceso[acceso_Seleccionado-1]
+        # Aqui va el menu iniciar sesion
+        if opcion_Acceso == 1:
+            def menuRegistrarse():
+            guardarDatos = Datos(usuarios)
+            try:
+                # Pedimos los datos
+                print("Ingrese su nomnre:")
+                nombre = input()
+                print("Ingrese su apellido:")
+                apellido = input()
+                print("Correo electronico:")
+                correo = input()
+                print("Ingrese una clave:")
+                clave = input()
+                while (True):
+                    if 8 <= len(clave) <=20:
+                        print("Confirme clave:")
+                        claveConfirmada = input()
+                        if claveConfirmada == clave:
+                            break
+                        else:
+                            print("Intente de nuevo")
+                    else:
+                        print("Ingrese entre 8 y 20 caracteres")
+                # Guardanmos los datos
+                nombre = guardarDatos.nombre
+                apellido = guardarDatos.apellido
+                correo = guardarDatos.correo
+                clave = guardarDatos.clave
+                # Mensaje a usuario
+                print("Datos guardados exitosamente")
+            except ValueError:
+                print("No ingreso ningun dato.")
+                return
+        if opcion_Acceso == 2:
+            def menuIniciarSesion():
+                        
+    else:
+        print("Ingrese una opcion valida")
+        return
 
 def main ():
     while True:
