@@ -35,8 +35,10 @@ class Datos:
             }
             self.usuarios.append(usuario)
             print("*** Usuario agregado con exito ***")
+            return True
         except ValueError:
             print(BADINFOREQUEST)
+            return False
 
     def agregarExperimento (self, nombre:str, fecha:str, tipo, resultado):
         try:
@@ -48,8 +50,10 @@ class Datos:
             }
             self.experimentos.append(experimento)
             print("*** Experimento cargado con exito ***")
+            return True
         except ValueError:
             print(BADINFOREQUEST)
+            return False
         
     # el metodo guardar nos permite guardar la informacion ya establecida
     def guardar (self): 
@@ -63,19 +67,19 @@ class Datos:
         if len(self.usuarios) > 0:
             for i in range(len(self.usuarios)):
                 usuario = self.usuarios[i]
-                text += f"\n{usuario['correo']}@\n{usuario['clave']}@\n{usuario['nombreArchivo']}@\n{usuario['formatoArchivo']}"
-                text += f"\n@{usuario['telefono']}\n@{usuario['fecha']}\n@{usuario['nombre']}\n@{usuario['apellido']}"
+                text += f"\n{usuario['correo']}~\n{usuario['clave']}~\n{usuario['nombreArchivo']}~\n{usuario['formatoArchivo']}"
+                text += f"\n~{usuario['telefono']}\n~{usuario['fecha']}\n~{usuario['nombre']}\n~{usuario['apellido']}"
                 if i < len(self.usuarios)-1:
                     text += "\n----"
         else:
             #si no hay usuarios se escribe uno por defecto
-            text += "usuario@\n0000"
+            text += "usuario~\n0000"
         # solo si hay experimentos se agrega informacion
         if len(self.experimentos) > 0:
             text += "\n####"
             for i in range(len(self.experimentos)):
                 experimento = self.experimentos[i]
-                text += f"\n{experimento['nombre']}@\n{experimento['fecha']}@\n{experimento['tipo']}@\n{experimento['resultados']}"
+                text += f"\n{experimento['nombre']}~\n{experimento['fecha']}~\n{experimento['tipo']}~\n{experimento['resultados']}"
         # abrimos el archivo donde estan los datos
         with open("datos.txt", "w") as datos:
             #escribimos la informacion
@@ -98,7 +102,7 @@ class Datos:
                 usuarios = tablasContenido[0].split("----")
                 for i in range(len(usuarios)):
                     # separamos los datos de cada usuario para formatearlo
-                    usuario_list = usuarios[i].split("@")
+                    usuario_list = usuarios[i].split("~")
                     usuario = {
                         'correo': usuario_list[0],
                         'clave': usuario_list[1],
@@ -117,7 +121,7 @@ class Datos:
                     experimentos = tablasContenido[1].split("----")
                     for i in range(len(experimentos)):
                         # y lo mismo con experimentos
-                        experimento_list = experimentos[i].split("@")
+                        experimento_list = experimentos[i].split("~")
                         experimento = {
                             'nombre': experimento_list[0],
                             'fecha': experimento_list[1],
@@ -153,7 +157,27 @@ def configuracion (usuario):
             print("2. No")
             respuesta = input(SELECT)
             if respuesta == "1" or respuesta == "si" or respuesta == "Si" or respuesta == "SI":
-                pass
+                print("Escriba el orden en que quiera que se ordenen los datos en el informe, separados por guiones")
+                print("Ejemplo: 2-1-4-3")
+                print(f"1. {FORMATOlETRAS['N']}")
+                print(f"2. {FORMATOlETRAS['T']}")
+                print(f"3. {FORMATOlETRAS['F']}")
+                print(f"4. {FORMATOlETRAS['R']}")
+                while True:
+                    response = input(SELECT)
+                    try:
+                        # esta variable es para almacenar el formato del informe
+                        fl = list(map(int, response.split("-")))
+                        formato = f"{fl[0]}-{fl[1]}-{fl[2]}-{fl[3]}"
+                        formato = formato.replace("1", "N")
+                        formato = formato.replace("2", "T")
+                        formato = formato.replace("3", "F")
+                        formato = formato.replace("4", "R")
+                        usuario['formatoArchivo'] = formato
+                        break
+                    except ValueError:
+                        print(BADINFOREQUEST)
+                    
             elif respuesta == "2" or respuesta == "no" or respuesta == "No" or respuesta == "NO":
                 break
             else:
@@ -208,7 +232,7 @@ def menuUsuario():
             apellido = input()
             print("Correo electronico:")
             correo = input()
-            
+
             while (True):
                 print("Ingrese una clave:")
                 clave = input()
@@ -221,23 +245,29 @@ def menuUsuario():
                         print("Intente de nuevo")
                 else:
                     print("Ingrese entre 8 y 20 caracteres")
+                    
             # Guardanmos los datos
-            datos.agregarUsuario(correo, clave, "", "", "", "", nombre, apellido)
-            # Mensaje a usuario
-            print("Datos guardados exitosamente")
+            datos.agregarUsuario(correo, clave, "", "", "", "11/11/2024", nombre, apellido)
+            datos.guardar()
         except ValueError:
             print("No ingreso ningun dato.")
         return
    
-   
+    def menuIniciarSesion():
+        print("Ingrese su correo:")
+        correo_a_Verificar = input()
+        print("Ingrese su clave:")
+        clave_a_Verificar = input()
+        
 
     print("Bienvenido a nuestro Asistente de Laboratorio")
     print("\nAcceso:")
     for i, opcion_Acceso in enumerate(acceso):
         print(f"{i+1}: {opcion_Acceso}")
 
-    acceso_Seleccionado = int(input())
+    acceso_Seleccionado = int(input(SELECT))
     if acceso_Seleccionado > 0 and acceso_Seleccionado <= len(acceso):
+
         if acceso_Seleccionado == 1:
             menuRegistrarse()
         elif acceso_Seleccionado == 2:
@@ -255,7 +285,7 @@ def main (data: Datos):
         print("--------------------")
         respuesta = input(SELECT)
         if respuesta == "1":
-            configuracion()
+            configuracion(data.usuarios[data.usuario])
         elif respuesta == "2":
             print("Saliendo del programa...")
             data.guardar()
@@ -265,4 +295,6 @@ def main (data: Datos):
 
 
 if __name__ == "__main__":
-    menuUsuario()
+    datos = Datos()
+    datos.usuario = 0
+    main(datos)
