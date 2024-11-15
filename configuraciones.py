@@ -111,11 +111,13 @@ def configuracion ():
     def dataBaseRestore ():
         pass
     while True:
+        print("\n-------------------")
         print("** Menu de configuracion **")
         print("1. Opciones de exportacion")
         print("2. Opciones de seguridad")
         print("3. Restablecer base de datos")
         print("4. Volver al menu principal")
+        print("-------------------")
         respuesta = input(SELECT)
         if respuesta == "1":
             optionExport()
@@ -134,9 +136,11 @@ def configuracion ():
 
 def main ():
     while True:
+        print("###########################")
         print("Menu principal")
         print("1. Configuracion")
         print("2. Salir")
+        print("###########################")
         respuesta = input(SELECT)
         if respuesta == "1":
             configuracion()
