@@ -131,7 +131,25 @@ def configuracion ():
     
     return
 
+# trabaja aqui edi
 
+
+def menuUsuario():
+    # vamos a abrir la base de datos
+    datos = Datos()
+    # viejo a partir de ahora todos los print dentro de funciones
+    acceso = ['Iniciar sesión', 'Registrarse']
+    # aqui van a estar todos los usuarios
+    usuarios = datos.usuarios
+
+    print("Bienvenido a nuestro Asistente de Laboratorio")
+    print("\nAcceso:")
+    for i, opcion_Acceso in enumerate(acceso):
+        print(f"{i+1}: {acceso}")
+
+    acceso_Seleccionado = int(input())
+    if acceso_Seleccionado > 0 and acceso_Seleccionado <= len(acceso):
+        opcion_Acceso = acceso[acceso_Seleccionado-1]
 
 def main ():
     while True:
@@ -151,4 +169,4 @@ def main ():
 
 
 if __name__ == "__main__":
-    main()
+    menuUsuario()
