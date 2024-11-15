@@ -17,7 +17,7 @@ class Datos:
                 'nombreArchivo': nombreArchivo,
                 'formatoArchivo': formatoArchivo,
                 'telefono': telefono,
-                'fecha': datetime(fecha, "%d/%m/%Y"),
+                'fecha': datetime.strptime(fecha, "%d/%m/%Y"),
                 'nombre': nombre,
                 'apellido': apellido
             }
@@ -166,9 +166,10 @@ def menuUsuario():
             apellido = input()
             print("Correo electronico:")
             correo = input()
-            print("Ingrese una clave:")
-            clave = input()
+            
             while (True):
+                print("Ingrese una clave:")
+                clave = input()
                 if 8 <= len(clave) <=20:
                     print("Confirme clave:")
                     claveConfirmada = input()
@@ -195,11 +196,9 @@ def menuUsuario():
 
     acceso_Seleccionado = int(input())
     if acceso_Seleccionado > 0 and acceso_Seleccionado <= len(acceso):
-        opcion_Acceso = acceso[acceso_Seleccionado-1]
-        # Aqui va el menu iniciar sesion
-        if opcion_Acceso == 1:
+        if acceso_Seleccionado == 1:
             menuRegistrarse()
-        elif opcion_Acceso == 2:
+        elif acceso_Seleccionado == 2:
             pass     
         else:
             print("Ingrese una opcion valida")

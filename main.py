@@ -29,7 +29,7 @@ class Datos:
                 'nombreArchivo': nombreArchivo,
                 'formatoArchivo': formatoArchivo,
                 'telefono': telefono,
-                'fecha': datetime(fecha, "%d/%m/%Y"),
+                'fecha': datetime.strptime(fecha, "%d/%m/%Y"),
                 'nombre': nombre,
                 'apellido': apellido
             }
