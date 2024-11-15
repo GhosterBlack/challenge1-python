@@ -193,10 +193,44 @@ def configuracion (usuario):
 def menuUsuario():
     # vamos a abrir la base de datos
     datos = Datos()
-    # viejo a partir de ahora todos los print dentro de funciones
-    acceso = ['Iniciar sesión', 'Registrarse']
+     # viejo a partir de ahora todos los print dentro de funciones
+    acceso = ['Registrarse','Iniciar sesion']
     # aqui van a estar todos los usuarios
     usuarios = datos.usuarios
+
+
+    def menuRegistrarse():
+        try:
+            # Pedimos los datos
+            print("Ingrese su nomnre:")
+            nombre = input()
+            print("Ingrese su apellido:")
+            apellido = input()
+            print("Correo electronico:")
+            correo = input()
+            
+            while (True):
+                print("Ingrese una clave:")
+                clave = input()
+                if 8 <= len(clave) <=20:
+                    print("Confirme clave:")
+                    claveConfirmada = input()
+                    if claveConfirmada == clave:
+                        break
+                    else:
+                        print("Intente de nuevo")
+                else:
+                    print("Ingrese entre 8 y 20 caracteres")
+            # Guardanmos los datos
+            datos.agregarUsuario(correo, clave, "", "", "", "", nombre, apellido)
+            # Mensaje a usuario
+            print("Datos guardados exitosamente")
+        except ValueError:
+            print("No ingreso ningun dato.")
+        return
+   
+   
+
     print("Bienvenido a nuestro Asistente de Laboratorio")
     print("\nAcceso:")
     for i, opcion_Acceso in enumerate(acceso):
@@ -204,7 +238,13 @@ def menuUsuario():
 
     acceso_Seleccionado = int(input())
     if acceso_Seleccionado > 0 and acceso_Seleccionado <= len(acceso):
-        opcion_Acceso = acceso[acceso_Seleccionado-1]
+        if acceso_Seleccionado == 1:
+            menuRegistrarse()
+        elif acceso_Seleccionado == 2:
+            pass     
+        else:
+            print("Ingrese una opcion valida")
+            return
 
 def main (data: Datos):
     while True:
