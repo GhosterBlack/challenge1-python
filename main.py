@@ -3,14 +3,13 @@ from datetime import datetime
 SELECT = "Seleccione una opcion: "
 BADOPTION = "Opcion incorrecta"
 BADINFOREQUEST = "! Datos ingresados no validos"
+WRITEURESPONSE = "Escriba su respuesta: "
 FORMATOlETRAS = {
     'N': "Nombre del experimento",
     'F': "Fecha del experimento",
     'T': "Tipo de experimento",
     'R': "Resultados del experimento"
 }
-
-# edi cuando inicies sesion recuerda poner en la variable usuario de los datos el id del usuario que inicia sesion
 
     
 # Declaramos una clase datos que sera usada por la funcion principal para controlar el archivo donde se guardan los datos
@@ -96,7 +95,10 @@ class Datos:
         with open("datos.txt", "w") as datos:
             #escribimos la informacion
             datos.write(text)
-            
+    
+    def clear (self):
+        self.experimentos = []
+        self.guardar()
 
 
 
@@ -142,7 +144,7 @@ class Datos:
                         self.experimentos.append(experimento)
 
 
-def configuracion (usuario):
+def configuracion (usuario, datos: Datos):
     def optionExport ():
         nombrePorDefecto = usuario['nombreArchivo']
         formatoPorDefecto = usuario['formatoArchivo']
@@ -197,16 +199,40 @@ def configuracion (usuario):
 
 
     def optionSecure ():
-        pass
+        print("Por favor ingrese la contraseña para poder cambiarla (De enter sin escribir nada para cancelar)")
+        response = input(WRITEURESPONSE)
+        if response == "":
+            return
+        if response == usuario['clave']:
+            print("Escriba la nueva contraseña")
+            nuevaClave = input(WRITEURESPONSE)
+            usuario['clave'] = nuevaClave
+            print("** Contraseña cambiada con exito **")
+                
     def dataBaseRestore ():
-        pass
+        print("¿Esta seguro de borrar la base de datos?")
+        print("1. Si")
+        print("2. No")
+        response = input(SELECT)
+        if response == "1" or response == "Si" or response == "si" or response == "SI":
+            datos.clear()
+        return
+            
+    def viewUserData ():
+        print("-----------------------------")
+        print("Informacion de perfil")
+        print(f"Nombre de usuario: {usuario['nombre']} {usuario['apellido']}")
+        print(f"Correo: {usuario['correo']}")
+        print(f"Numero de telefono: {usuario['telefono']}")
+        print("-----------------------------")
     while True:
         print("\n-------------------")
         print("** Menu de configuracion **")
         print("1. Opciones de exportacion")
         print("2. Opciones de seguridad")
         print("3. Restablecer base de datos")
-        print("4. Volver al menu principal")
+        print("4. Ver datos de usuario")
+        print("5. Volver al menu principal")
         print("-------------------")
         respuesta = input(SELECT)
         if respuesta == "1":
@@ -216,6 +242,8 @@ def configuracion (usuario):
         elif respuesta == "3":
             dataBaseRestore()
         elif respuesta == "4":
+            viewUserData()
+        elif respuesta == "5":
             break
         else:
             print(BADOPTION)
@@ -231,7 +259,7 @@ def main (data: Datos):
         print("--------------------")
         respuesta = input(SELECT)
         if respuesta == "1":
-            configuracion(data.obtenerUsuario())
+            configuracion(data.obtenerUsuario(), data)
         elif respuesta == "2":
             print("Saliendo del programa...")
             data.guardar()
@@ -242,30 +270,34 @@ def main (data: Datos):
 
 # trabaja aqui edi
 
-
 def menuUsuario():
     # vamos a abrir la base de datos
     datos = Datos()
      # viejo a partir de ahora todos los print dentro de funciones
-    acceso = ['Registrarse','Iniciar sesion']
+    acceso = ['Iniciar sesion','Registrarse']
     # aqui van a estar todos los usuarios
     usuarios = datos.usuarios
 
 
     def menuRegistrarse():
-        try:
+        while True:
             # Pedimos los datos
-            print("Ingrese su nomnre:")
+            print("Ingrese su nombre:")
             nombre = input()
+            if not (nombre.isalpha() and len(nombre) > 2) or ("~" in nombre):
+                break
             print("Ingrese su apellido:")
             apellido = input()
+            if not (apellido.isalpha() and len(apellido) > 2) or ("~" in apellido):
+                break
             print("Correo electronico:")
             correo = input()
-
+            if not ("@" in correo and ".com" in correo) or ("~" in correo):
+                break
             while (True):
                 print("Ingrese una clave:")
                 clave = input()
-                if 8 <= len(clave) <=20:
+                if 8 <= len(clave) <=20 and not "~" in clave:
                     print("Confirme clave:")
                     claveConfirmada = input()
                     if claveConfirmada == clave:
@@ -274,13 +306,14 @@ def menuUsuario():
                         print("Intente de nuevo")
                 else:
                     print("Ingrese entre 8 y 20 caracteres")
-                    
+            print("Ingrese su numero de telefono:")
+            telefono = str(input())
+            if not (0 <= len(telefono) <=10):
+                return                   
             # Guardanmos los datos
-            datos.agregarUsuario(correo, clave, "", "", "", nombre, apellido)
+            datos.agregarUsuario(correo, clave, "", "", telefono, nombre, apellido)
+            # Mensaje a usuario
             datos.guardar()
-        except ValueError:
-            print("No ingreso ningun dato.")
-        return
    
     def menuIniciarSesion():
         print("Ingrese su correo:")
@@ -288,26 +321,26 @@ def menuUsuario():
         print("Ingrese su clave:")
         clave_a_Verificar = input()
         
+        # Verificar las credenciales
+        datos.iniciarSesion(correo_a_Verificar, clave_a_Verificar,)
+        
 
     print("Bienvenido a nuestro Asistente de Laboratorio")
     print("\nAcceso:")
     for i, opcion_Acceso in enumerate(acceso):
         print(f"{i+1}: {opcion_Acceso}")
 
-    acceso_Seleccionado = int(input(SELECT))
+    acceso_Seleccionado = int(input())
     if acceso_Seleccionado > 0 and acceso_Seleccionado <= len(acceso):
 
         if acceso_Seleccionado == 1:
-            menuRegistrarse()
+            pass
         elif acceso_Seleccionado == 2:
+            menuRegistrarse()
             pass     
         else:
             print("Ingrese una opcion valida")
             return
 
-
-
 if __name__ == "__main__":
-    datos = Datos()
-    datos.usuario = 0
-    main(datos)
+    menuUsuario()
