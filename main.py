@@ -36,24 +36,19 @@ class Datos:
         if self.usuario > -1:
             return self.usuarios[self.usuario]
 
-    def agregarUsuario (self, correo: str, clave: str, nombreArchivo: str, formatoArchivo: str, telefono: str, fecha: str, nombre: str, apellido: str):
-        try: 
-            usuario = {
-                'correo': correo,
-                'clave': clave,
-                'nombreArchivo': nombreArchivo,
-                'formatoArchivo': formatoArchivo,
-                'telefono': telefono,
-                'fecha': datetime.strptime(fecha, "%d/%m/%Y"),
-                'nombre': nombre,
-                'apellido': apellido
-            }
-            self.usuarios.append(usuario)
-            print("*** Usuario agregado con exito ***")
-            return True
-        except ValueError:
-            print(BADINFOREQUEST)
-            return False
+    def agregarUsuario (self, correo: str, clave: str, nombreArchivo: str, formatoArchivo: str, telefono: str, nombre: str, apellido: str):
+        usuario = {
+            'correo': correo,
+            'clave': clave,
+            'nombreArchivo': nombreArchivo,
+            'formatoArchivo': formatoArchivo,
+            'telefono': telefono,
+            'nombre': nombre,
+            'apellido': apellido
+        }
+        self.usuarios.append(usuario)
+        print("*** Usuario agregado con exito ***")
+        return usuario
 
     def agregarExperimento (self, nombre:str, fecha:str, tipo, resultado):
         try:
@@ -65,7 +60,7 @@ class Datos:
             }
             self.experimentos.append(experimento)
             print("*** Experimento cargado con exito ***")
-            return True
+            return experimento
         except ValueError:
             print(BADINFOREQUEST)
             return False
@@ -83,7 +78,7 @@ class Datos:
             for i in range(len(self.usuarios)):
                 usuario = self.usuarios[i]
                 text += f"\n{usuario['correo']}~\n{usuario['clave']}~\n{usuario['nombreArchivo']}~\n{usuario['formatoArchivo']}"
-                text += f"\n~{usuario['telefono']}\n~{usuario['fecha']}\n~{usuario['nombre']}\n~{usuario['apellido']}"
+                text += f"\n~{usuario['telefono']}\n~{usuario['nombre']}\n~{usuario['apellido']}"
                 if i < len(self.usuarios)-1:
                     text += "\n----"
         else:
@@ -95,6 +90,8 @@ class Datos:
             for i in range(len(self.experimentos)):
                 experimento = self.experimentos[i]
                 text += f"\n{experimento['nombre']}~\n{experimento['fecha']}~\n{experimento['tipo']}~\n{experimento['resultados']}"
+                if i < len(self.experimentos)-1:
+                    text += "\n----"
         # abrimos el archivo donde estan los datos
         with open("datos.txt", "w") as datos:
             #escribimos la informacion
@@ -124,9 +121,8 @@ class Datos:
                         'nombreArchivo': usuario_list[2],
                         'formatoArchivo': usuario_list[3],
                         'telefono': usuario_list[4],
-                        'fecha': usuario_list[5],
-                        'nombre': usuario_list[6],
-                        'apellido': usuario_list[7]
+                        'nombre': usuario_list[5],
+                        'apellido': usuario_list[6]
                     }
                     if usuario['correo'] != "usuario":
                         self.usuarios.append(usuario)
@@ -280,7 +276,7 @@ def menuUsuario():
                     print("Ingrese entre 8 y 20 caracteres")
                     
             # Guardanmos los datos
-            datos.agregarUsuario(correo, clave, "", "", "", "11/11/2024", nombre, apellido)
+            datos.agregarUsuario(correo, clave, "", "", "", nombre, apellido)
             datos.guardar()
         except ValueError:
             print("No ingreso ningun dato.")
