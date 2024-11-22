@@ -41,10 +41,11 @@ class Experimento:
     def maximo (self):
         return max(self.resultados)
     
-    def __init__(self, nombre, fecha, tipo):
+    def __init__(self, nombre, fecha, tipo, resultados = []):
         self.nombre = nombre
         self.fecha = fecha
         self.tipo = tipo
+        self.resultados = resultados
 
 class Datos:
     
