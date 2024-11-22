@@ -267,7 +267,6 @@ def main (data: Datos):
         else:
             print(BADOPTION)
 
-
 # trabaja aqui edi
 
 def menuUsuario():
