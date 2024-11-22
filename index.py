@@ -5,6 +5,8 @@ SELECT = "Seleccione una opcion: "
 BADOPTION = "Opcion incorrecta"
 BADINFOREQUEST = "! Datos ingresados no validos"
 WRITEURESPONSE = "Escriba su respuesta: "
+BARSPACE = "--------------------"
+RETURNTOMENU = "Volver al menu principal"
 FORMATOlETRAS = {
     'N': "Nombre del experimento",
     'F': "Fecha del experimento",
@@ -18,6 +20,28 @@ def verificar_email(email):
 
 
 # Declaramos una clase datos que sera usada por la funcion principal para controlar el archivo donde se guardan los datos
+class Experimento:
+    resultados: list[float] = []
+
+    def promedio (self):
+        result = self.resultados
+        suma = 0
+        length = len(result)
+        for i in range(length):
+            suma += result[i]
+        return suma / length
+
+    def minimo (self):
+        return min(self.resultados)
+
+    def maximo (self):
+        return max(self.resultados)
+    
+    def _init_(self, nombre, fecha, tipo):
+        self.nombre = nombre
+        self.fecha = fecha
+        self.tipo = tipo
+
 class Datos:
     
     usuarios = []
@@ -39,7 +63,11 @@ class Datos:
     def obtenerUsuario (self):
         if self.usuario > -1:
             return self.usuarios[self.usuario]
-
+    def validar_fecha (fecha):
+        try:
+          return datetime.strptime(fecha, '%Y-%m-%d')
+        except:
+          return False
     def agregarUsuario (self, correo: str, clave: str, nombreArchivo: str, formatoArchivo: str, telefono: str, nombre: str, apellido: str):
         usuario = {
             'correo': correo,
@@ -64,8 +92,9 @@ class Datos:
             print("¿Ya realizó el experimento? (si/no)")
             confirm_Realiz_Experimento = input().strip().lower()
             if confirm_Realiz_Experimento == "si":
-                fecha = input("Ingrese la fecha en que realizó el experimento (YYYY-MM-DD): ")
-                if not self.validar_fecha(fecha):
+                fecha_str = input("Ingrese la fecha en que realizó el experimento (YYYY-MM-DD): ")
+                fecha = self.validar_fecha(fecha_str)
+                if not fecha:
                     print("Fecha inválida. Intente de nuevo.")
                     continue
                 datos_resultados = int(input("¿Cuántos datos desea almacenar en los resultados? "))
@@ -110,7 +139,7 @@ class Datos:
             text += "\n####"
             for i in range(len(self.experimentos)):
                 experimento = self.experimentos[i]
-                text += f"\n{experimento['nombre']}\n{experimento['fecha']}\n{experimento['tipo']}~\n{experimento['resultados']}"
+                text += f"\n{experimento['nombre']}~\n{experimento['fecha']}~\n{experimento['tipo']}~\n{str(experimento['resultados'])}"
                 if i < len(self.experimentos)-1:
                     text += "\n----"
         # abrimos el archivo donde estan los datos
@@ -156,37 +185,108 @@ class Datos:
                     for i in range(len(experimentos)):
                         # y lo mismo con experimentos
                         experimento_list = experimentos[i].split("~")
-                        experimento = {
-                            'nombre': experimento_list[0],
-                            'fecha': experimento_list[1],
-                            'tipo': experimento_list[2],
-                            'resultados': experimento_list[3]
-                        }
+                        experimento = Experimento(experimento_list[0], experimento_list[1], experimento_list[2])
+                        experimento.resultados = eval(experimento_list[3])
                         self.experimentos.append(experimento)
 
-class Experimento:
-    resultados: list[float] = []
 
-    def promedio (self):
-        result = self.resultados
-        suma = 0
-        length = len(result)
-        for i in range(length):
-            suma += result[i]
-        return suma / length
+def obtenerInforme (indexs: list[int], datos: Datos):
+    # declaramos esta variable que va a almacenar todos los experimentos que seran detallados en el informe
+    paraInforme: list[Experimento] = []
+    experimentos = datos.experimentos
+    formatoInforme: str = datos.obtenerUsuario()["formatoArchivo"]
+    if formatoInforme == "":
+        formatoInforme = "N-T-F-R"
 
-    def minimo (self):
-        return min(self.resultados)
-
-    def maximo (self):
-        return max(self.resultados)
+    if formatoInforme:
+        formatoInforme = formatoInforme.split("-")
+    informe = "Informe de experimentos \n \n"
+    if len(indexs) == 0:
+        # si no hay elementos en indexs significa que sera de todos los experimentos
+        paraInforme = experimentos
+    else:
+        # en caso de que si haya elementos en index significa que si habra una discriminacion de experimentos
+        for i, index in enumerate(indexs):
+            experimento = experimentos[index]
+            paraInforme.append(experimento)
     
-    def _init_(self, nombre, fecha, tipo):
-        self.nombre = nombre
-        self.fecha = fecha
-        self.tipo = tipo
+    for i, experimento in enumerate(paraInforme):
+        informe += f"Experimento numero {i+1} \n"
+        resultados = "|"
+        for h in range(len(experimento.resultados)):
+            resultados += experimento.resultados[h] + "|"
+        for j in range(len(formatoInforme)):
+            seccion = formatoInforme[j]
+            if seccion == "N":
+                informe += f"Nombre: {experimento.nombre} \n"
+            if seccion == "F":
+                informe += f"Fecha de realizacion: {experimento.fecha} \n"
+            if seccion == "T":
+                informe += f"Tipo: {experimento.tipo} \n"
+            if seccion == "R":
+                informe += f"Resultados: \n {resultados}"
+    return informe
+        
+def exportarInforme (informe, usuario):
+    nombreArchivo = usuario['nombreArchivo']
+    if nombreArchivo == "":
+        nombreArchivo = usuario['nombre'] + " " + usuario['telefono'] + ".txt"
+    with open(nombreArchivo, "w") as archivo:
+        archivo.write(informe)
+        print("* Informe guardado con exito *")
 
+def mostrarExperimentos (experimentos: list[Experimento]):
+    for i, experimento in enumerate(experimentos):
+        print(f"{i+1}. {experimento.nombre}")
+    pass
 
+# funcion para menu principal
+def generarInforme (datos: Datos):
+    # esta variable esta definida fuera del while para que las diferentes ciclos de este no la alteren
+    # Es basicamente la lista que controla que experimentos iran en el informe si esta vacia todos los experimentos
+    # seran incluidos
+    paraInforme = []
+    while True:
+        print(BARSPACE)
+        print("Generar informe")
+        print("1. Exportar informe")
+        print("2. Previsualizacion de informe")
+        print("3. Seleccionar experimentos para informe")
+        print("4. "+RETURNTOMENU)
+        print(BARSPACE)
+        response = input(SELECT)
+        if response == "1":
+            informe = obtenerInforme(paraInforme, datos)
+            exportarInforme(informe, datos.obtenerUsuario())
+        elif response == "2":
+            print(obtenerInforme(paraInforme, datos))
+        elif response == "3":
+            print("Seleccione los experimentos que va a incluir en el informe")
+            print("0. Seleccionar todos")
+            mostrarExperimentos(datos.experimentos)
+            isBreak = False
+            while not isBreak:
+                select = input(SELECT)
+                if not select.isnumeric():
+                    print("Escriba un numero")
+                    continue
+                select = int(select)
+                if select > 0: 
+                    paraInforme.append(select-1)
+                    print("¿Desea ingresar otro experimento?")
+                    print("1. Si")
+                    print("2. No")
+                    respuesta = input()
+                    if respuesta == "2" or respuesta == "No" or respuesta == "NO" or respuesta == "no":
+                        isBreak = True
+                else:
+                    paraInforme = []
+                    isBreak = True
+        elif response == "4":
+            break
+        else:
+            print(BADOPTION)
+                
 
 def configuracion (usuario, datos: Datos):
     def optionExport ():
@@ -205,7 +305,7 @@ def configuracion (usuario, datos: Datos):
             print(f"{i+1}. {FORMATOlETRAS[letra]}")
 
         print("Escriba el nombre de exportacion de su archivo, si no desea cambiarlo precione enter sin escribir nada")
-        respuesta = input(SELECT)
+        respuesta = input()
         if respuesta != "":
             usuario['nombreArchivo'] = respuesta
         while True:
@@ -263,21 +363,21 @@ def configuracion (usuario, datos: Datos):
         return
             
     def viewUserData ():
-        print("-----------------------------")
+        print(BARSPACE)
         print("Informacion de perfil")
         print(f"Nombre de usuario: {usuario['nombre']} {usuario['apellido']}")
         print(f"Correo: {usuario['correo']}")
         print(f"Numero de telefono: {usuario['telefono']}")
-        print("-----------------------------")
+        print(BARSPACE)
     while True:
-        print("\n-------------------")
+        print("\n"+BARSPACE)
         print("** Menu de configuracion **")
         print("1. Opciones de exportacion")
         print("2. Opciones de seguridad")
         print("3. Restablecer base de datos")
         print("4. Ver datos de usuario")
-        print("5. Volver al menu principal")
-        print("-------------------")
+        print("5. "+RETURNTOMENU)
+        print(BARSPACE)
         respuesta = input(SELECT)
         if respuesta == "1":
             optionExport()
