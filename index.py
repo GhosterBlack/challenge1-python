@@ -54,7 +54,7 @@ class Datos:
         print("*** Usuario agregado con exito ***")
         return usuario
 
-    def agregar_experimento(self):
+    def agregarExperimento(self):
         nombre = input("Ingrese el nombre del experimento: ")
         tipo = input("Ingrese el tipo de experimento: ")
         fecha = ""
@@ -385,7 +385,7 @@ def main (data: Datos):
         print("--------------------")
         respuesta = input(SELECT)
         if respuesta == "1":
-            Datos.agregar_experimento()
+            data.agregarExperimento()
         elif respuesta == "8":
             configuracion(data.obtenerUsuario())
         elif respuesta == "9":
