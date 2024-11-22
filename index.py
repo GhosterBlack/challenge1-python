@@ -12,16 +12,34 @@ FORMATOlETRAS = {
     'R': "Resultados del experimento"
 }
 
-def verificar_email(email):
-    patron = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    return re.match(patron, email) is not None
-
-
 # Declaramos una clase datos que sera usada por la funcion principal para controlar el archivo donde se guardan los datos
+
+class Experimento:
+    resultados: list[float] = []
+
+    def promedio (self):
+        result = self.resultados
+        suma = 0
+        length = len(result)
+        for i in range(length):
+            suma += result[i]
+        return suma / length
+
+    def minimo (self):
+        return min(self.resultados)
+
+    def maximo (self):
+        return max(self.resultados)
+    
+    def __init__(self, nombre, fecha, tipo):
+        self.nombre = nombre
+        self.fecha = fecha
+        self.tipo = tipo
+
 class Datos:
     
     usuarios = []
-    experimentos = []
+    experimentos: list[Experimento] = []
     usuario = -1
     
     def iniciarSesion (self, correo, clave):
@@ -54,14 +72,8 @@ class Datos:
         print("*** Usuario agregado con exito ***")
         return usuario
 
-    def agregarExperimento (self, nombre:str, fecha:str, tipo, resultado):
+    def agregarExperimento (self, experimento: Experimento):
         try:
-            experimento = {
-                'nombre': nombre,
-                'fecha': fecha,
-                'tipo': tipo,
-                'resultado': resultado
-            }
             self.experimentos.append(experimento)
             print("*** Experimento cargado con exito ***")
             return experimento
@@ -93,7 +105,7 @@ class Datos:
             text += "\n####"
             for i in range(len(self.experimentos)):
                 experimento = self.experimentos[i]
-                text += f"\n{experimento['nombre']}~\n{experimento['fecha']}~\n{experimento['tipo']}~\n{experimento['resultados']}"
+                text += f"\n{experimento['nombre']}~\n{experimento['fecha']}~\n{experimento['tipo']}~\n{str(experimento['resultados'])}"
                 if i < len(self.experimentos)-1:
                     text += "\n----"
         # abrimos el archivo donde estan los datos
@@ -139,35 +151,15 @@ class Datos:
                     for i in range(len(experimentos)):
                         # y lo mismo con experimentos
                         experimento_list = experimentos[i].split("~")
-                        experimento = {
-                            'nombre': experimento_list[0],
-                            'fecha': experimento_list[1],
-                            'tipo': experimento_list[2],
-                            'resultados': experimento_list[3]
-                        }
+                        experimento = Experimento(experimento_list[0], experimento_list[1], experimento_list[2])
+                        experimento.resultados = eval(experimento_list[3])
                         self.experimentos.append(experimento)
 
-class Experimento:
-    resultados: list[float] = []
 
-    def promedio (self):
-        result = self.resultados
-        suma = 0
-        length = len(result)
-        for i in range(length):
-            suma += result[i]
-        return suma / length
+def verificar_email(email):
+    patron = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return re.match(patron, email) is not None
 
-    def minimo (self):
-        return min(self.resultados)
-
-    def maximo (self):
-        return max(self.resultados)
-    
-    def __init__(self, nombre, fecha, tipo):
-        self.nombre = nombre
-        self.fecha = fecha
-        self.tipo = tipo
 
 def configuracion (usuario, datos: Datos):
     def optionExport ():
@@ -275,6 +267,8 @@ def configuracion (usuario, datos: Datos):
     
     return
 
+def generarInforme ():
+    pass
 
 # Función principal para gestionar el acceso de usuarios
 def menuUsuario():
