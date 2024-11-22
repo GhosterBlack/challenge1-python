@@ -454,21 +454,6 @@ def menuUsuario():
             print("Datos guardados exitosamente")
             break
 
-    def menuIniciarSesion():
-        if not datos.usuarios:
-            print("No hay usuarios registrados")
-            return
-        print("Ingrese su correo:")
-        correo_a_Verificar = input()
-        print("Ingrese su clave:")
-        clave_a_Verificar = input()
-        usuario = datos.iniciarSesion(correo_a_Verificar, clave_a_Verificar)
-        if usuario:
-            print(f"Bienvenido, {usuario['nombre']}")
-            main(datos)
-            break
-        else:
-            print("Correo o clave incorrectos")
 
     while True:
         print("Bienvenido a nuestro Asistente de Laboratorio")
@@ -478,7 +463,20 @@ def menuUsuario():
 
         acceso_Seleccionado = int(input())
         if acceso_Seleccionado == 1:
-            menuIniciarSesion()
+            if not datos.usuarios:
+                print("No hay usuarios registrados")
+                continue
+            print("Ingrese su correo:")
+            correo_a_Verificar = input()
+            print("Ingrese su clave:")
+            clave_a_Verificar = input()
+            usuario = datos.iniciarSesion(correo_a_Verificar, clave_a_Verificar)
+            if usuario:
+                print(f"Bienvenido, {usuario['nombre']}")
+                main(datos)
+                break
+            else:
+                print("Correo o clave incorrectos")
         elif acceso_Seleccionado == 2:
             menuRegistrarse()
         else:
