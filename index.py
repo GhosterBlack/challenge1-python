@@ -146,6 +146,7 @@ class Datos:
         with open("datos.txt", "w") as datos:
             #escribimos la informacion
             datos.write(text)
+            print("datos guardados")
     
     def clear (self):
         self.experimentos = []
@@ -404,7 +405,7 @@ def menuUsuario():
     datos = Datos()
     # viejo a partir de ahora todos los print dentro de funciones
     acceso = ['Iniciar sesión', 'Registrarse']
-    
+    print(datos.usuarios)
     def menuRegistrarse():
         while True:
             print("Ingrese su nombre:")
@@ -422,7 +423,7 @@ def menuUsuario():
                 continue
             print("Ingrese una clave:")
             clave = input()
-            if 8 <= len(clave) <= 20:
+            while 8 <= len(clave) <= 20:
                 print("Confirme clave:")
                 claveConfirmada = input()
                 if clave == claveConfirmada:
