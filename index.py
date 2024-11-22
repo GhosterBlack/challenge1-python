@@ -144,8 +144,8 @@ class Datos:
         if len(self.experimentos) > 0:
             text += "\n####"
             for i in range(len(self.experimentos)):
-                experimento = self.experimentos[i]
-                text += f"\n{experimento['nombre']}\n~{experimento['fecha']}\n~{experimento['tipo']}\n~{str(experimento['resultados'])}"
+                experimento: Experimento = self.experimentos[i]
+                text += f"\n{experimento.nombre}\n~{experimento.fecha}\n~{experimento.tipo}\n~{str(experimento.resultados)}"
                 if i < len(self.experimentos)-1:
                     text += "\n----"
         # abrimos el archivo donde estan los datos
@@ -466,6 +466,7 @@ def menuUsuario():
         if usuario:
             print(f"Bienvenido, {usuario['nombre']}")
             main(datos)
+            break
         else:
             print("Correo o clave incorrectos")
 
@@ -484,8 +485,8 @@ def menuUsuario():
             print("Ingrese una opción válida")
 
 def main (data: Datos):
-    borrarConsola()
     while True:
+        borrarConsola()
         print("--------------------")
         print("Menu principal")
         print("1. Agregar experimento")
