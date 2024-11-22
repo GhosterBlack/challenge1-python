@@ -5,6 +5,8 @@ SELECT = "Seleccione una opcion: "
 BADOPTION = "Opcion incorrecta"
 BADINFOREQUEST = "! Datos ingresados no validos"
 WRITEURESPONSE = "Escriba su respuesta: "
+BARSPACE = "--------------------"
+RETURNTOMENU = "Volver al menu principal"
 FORMATOlETRAS = {
     'N': "Nombre del experimento",
     'F': "Fecha del experimento",
@@ -178,7 +180,7 @@ def configuracion (usuario, datos: Datos):
             print(f"{i+1}. {FORMATOlETRAS[letra]}")
 
         print("Escriba el nombre de exportacion de su archivo, si no desea cambiarlo precione enter sin escribir nada")
-        respuesta = input(SELECT)
+        respuesta = input()
         if respuesta != "":
             usuario['nombreArchivo'] = respuesta
         while True:
@@ -236,20 +238,20 @@ def configuracion (usuario, datos: Datos):
         return
             
     def viewUserData ():
-        print("-----------------------------")
+        print(BARSPACE)
         print("Informacion de perfil")
         print(f"Nombre de usuario: {usuario['nombre']} {usuario['apellido']}")
         print(f"Correo: {usuario['correo']}")
         print(f"Numero de telefono: {usuario['telefono']}")
-        print("-----------------------------")
+        print(BARSPACE)
     while True:
-        print("\n-------------------")
+        print("\n"+BARSPACE)
         print("** Menu de configuracion **")
         print("1. Opciones de exportacion")
         print("2. Opciones de seguridad")
         print("3. Restablecer base de datos")
         print("4. Ver datos de usuario")
-        print("5. Volver al menu principal")
+        print("5. "+RETURNTOMENU)
         print("-------------------")
         respuesta = input(SELECT)
         if respuesta == "1":
@@ -267,8 +269,103 @@ def configuracion (usuario, datos: Datos):
     
     return
 
-def generarInforme ():
+def obtenerInforme (indexs: list[int], datos: Datos):
+    # declaramos esta variable que va a almacenar todos los experimentos que seran detallados en el informe
+    paraInforme: list[Experimento] = []
+    experimentos = datos.experimentos
+    formatoInforme: str = datos.obtenerUsuario()["formatoArchivo"]
+    if formatoInforme == "":
+        formatoInforme = "N-T-F-R"
+
+    if formatoInforme:
+        formatoInforme = formatoInforme.split("-")
+    informe = "Informe de experimentos \n \n"
+    if len(indexs) == 0:
+        # si no hay elementos en indexs significa que sera de todos los experimentos
+        paraInforme = experimentos
+    else:
+        # en caso de que si haya elementos en index significa que si habra una discriminacion de experimentos
+        for i, index in enumerate(indexs):
+            experimento = experimentos[index]
+            paraInforme.append(experimento)
+    
+    for i, experimento in enumerate(paraInforme):
+        informe += f"Experimento numero {i+1} \n"
+        resultados = "|"
+        for h in range(len(experimento.resultados)):
+            resultados += experimento.resultados[h] + "|"
+        for j in range(len(formatoInforme)):
+            seccion = formatoInforme[j]
+            if seccion == "N":
+                informe += f"Nombre: {experimento.nombre} \n"
+            if seccion == "F":
+                informe += f"Fecha de realizacion: {experimento.fecha} \n"
+            if seccion == "T":
+                informe += f"Tipo: {experimento.tipo} \n"
+            if seccion == "R":
+                informe += f"Resultados: \n {resultados}"
+    return informe
+        
+def exportarInforme (informe, usuario):
+    nombreArchivo = usuario['nombreArchivo']
+    if nombreArchivo == "":
+        nombreArchivo = usuario['nombre'] + " " + usuario['telefono'] + ".txt"
+    with open(nombreArchivo, "w") as archivo:
+        archivo.write(informe)
+        print("* Informe guardado con exito *")
+
+def mostrarExperimentos (experimentos: list[Experimento]):
+    for i, experimento in enumerate(experimentos):
+        print(f"{i+1}. {experimento.nombre}")
     pass
+
+# funcion para menu principal
+def generarInforme (datos: Datos):
+    # esta variable esta definida fuera del while para que las diferentes ciclos de este no la alteren
+    # Es basicamente la lista que controla que experimentos iran en el informe si esta vacia todos los experimentos
+    # seran incluidos
+    paraInforme = []
+    while True:
+        print(BARSPACE)
+        print("Generar informe")
+        print("1. Exportar informe")
+        print("2. Previsualizacion de informe")
+        print("3. Seleccionar experimentos para informe")
+        print("4. "+RETURNTOMENU)
+        print(BARSPACE)
+        response = input(SELECT)
+        if response == "1":
+            informe = obtenerInforme(paraInforme, datos)
+            exportarInforme(informe, datos.obtenerUsuario())
+        elif response == "2":
+            print(obtenerInforme(paraInforme, datos))
+        elif response == "3":
+            print("Seleccione los experimentos que va a incluir en el informe")
+            print("0. Seleccionar todos")
+            mostrarExperimentos(datos.experimentos)
+            isBreak = False
+            while not isBreak:
+                select = input(SELECT)
+                if not select.isnumeric():
+                    print("Escriba un numero")
+                    continue
+                select = int(select)
+                if select > 0: 
+                    paraInforme.append(select-1)
+                    print("¿Desea ingresar otro experimento?")
+                    print("1. Si")
+                    print("2. No")
+                    respuesta = input()
+                    if respuesta == "2" or respuesta == "No" or respuesta == "NO" or respuesta == "no":
+                        isBreak = True
+                else:
+                    paraInforme = []
+                    isBreak = True
+        elif response == "4":
+            break
+        else:
+            print(BADOPTION)
+                
 
 # Función principal para gestionar el acceso de usuarios
 def menuUsuario():
@@ -343,7 +440,7 @@ def menuUsuario():
 
 def main (data: Datos):
     while True:
-        print("--------------------")
+        print(BARSPACE)
         print("Menu principal")
         print("1. Agregar experimento")
         print("2. Editar experimento")
@@ -353,7 +450,7 @@ def main (data: Datos):
         print("6. Generar informe")
         print("7. Configuracion")
         print("8. Salir")
-        print("--------------------")
+        print(BARSPACE)
         respuesta = input(SELECT)
         if respuesta == "1":
             configuracion(data.obtenerUsuario())
