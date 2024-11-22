@@ -67,7 +67,7 @@ class Datos:
     def obtenerUsuario (self):
         if self.usuario > -1:
             return self.usuarios[self.usuario]
-    def validar_fecha (fecha):
+    def validar_fecha (self, fecha):
         try:
           return datetime.strptime(fecha, '%Y-%m-%d')
         except:
