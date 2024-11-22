@@ -1,5 +1,9 @@
 import re
 from datetime import datetime
+import os
+import platform
+
+
 # constantes
 SELECT = "Seleccione una opcion: "
 BADOPTION = "Opcion incorrecta"
@@ -37,7 +41,7 @@ class Experimento:
     def maximo (self):
         return max(self.resultados)
     
-    def _init_(self, nombre, fecha, tipo):
+    def __init__(self, nombre, fecha, tipo):
         self.nombre = nombre
         self.fecha = fecha
         self.tipo = tipo
@@ -83,6 +87,7 @@ class Datos:
         return usuario
 
     def agregarExperimento(self):
+        borrarConsola()
         nombre = input("Ingrese el nombre del experimento: ")
         tipo = input("Ingrese el tipo de experimento: ")
         fecha = ""
@@ -127,7 +132,7 @@ class Datos:
         if len(self.usuarios) > 0:
             for i in range(len(self.usuarios)):
                 usuario = self.usuarios[i]
-                text += f"\n{usuario['correo']}\n{usuario['clave']}\n{usuario['nombreArchivo']}~\n{usuario['formatoArchivo']}"
+                text += f"\n{usuario['correo']}\n~{usuario['clave']}\n~{usuario['nombreArchivo']}\n~{usuario['formatoArchivo']}"
                 text += f"\n~{usuario['telefono']}\n~{usuario['nombre']}\n~{usuario['apellido']}"
                 if i < len(self.usuarios)-1:
                     text += "\n----"
@@ -139,7 +144,7 @@ class Datos:
             text += "\n####"
             for i in range(len(self.experimentos)):
                 experimento = self.experimentos[i]
-                text += f"\n{experimento['nombre']}~\n{experimento['fecha']}~\n{experimento['tipo']}~\n{str(experimento['resultados'])}"
+                text += f"\n{experimento['nombre']}\n~{experimento['fecha']}\n~{experimento['tipo']}\n~{str(experimento['resultados'])}"
                 if i < len(self.experimentos)-1:
                     text += "\n----"
         # abrimos el archivo donde estan los datos
@@ -154,7 +159,7 @@ class Datos:
 
 
 # declaramos la funcion iniciadora
-    def _init_(self) -> None:
+    def __init__(self) -> None:
         # abrimos el archivo de datos
         with open("datos.txt", "r") as datos:
             text: str = datos.read()
@@ -190,6 +195,11 @@ class Datos:
                         experimento.resultados = eval(experimento_list[3])
                         self.experimentos.append(experimento)
 
+def borrarConsola():
+    if platform.system() == "Windows":
+        os.system('cls')
+    else:
+        os.system('clear')
 
 def obtenerInforme (indexs: list[int], datos: Datos):
     # declaramos esta variable que va a almacenar todos los experimentos que seran detallados en el informe
@@ -246,6 +256,7 @@ def generarInforme (datos: Datos):
     # esta variable esta definida fuera del while para que las diferentes ciclos de este no la alteren
     # Es basicamente la lista que controla que experimentos iran en el informe si esta vacia todos los experimentos
     # seran incluidos
+    borrarConsola()
     paraInforme = []
     while True:
         print(BARSPACE)
@@ -290,6 +301,7 @@ def generarInforme (datos: Datos):
                 
 
 def configuracion (usuario, datos: Datos):
+    borrarConsola()
     def optionExport ():
         nombrePorDefecto = usuario['nombreArchivo']
         formatoPorDefecto = usuario['formatoArchivo']
@@ -401,11 +413,11 @@ def configuracion (usuario, datos: Datos):
 
 # Función principal para gestionar el acceso de usuarios
 def menuUsuario():
+    borrarConsola()
     # vamos a abrir la base de datos
     datos = Datos()
     # viejo a partir de ahora todos los print dentro de funciones
     acceso = ['Iniciar sesión', 'Registrarse']
-    print(datos.usuarios)
     def menuRegistrarse():
         while True:
             print("Ingrese su nombre:")
@@ -471,6 +483,7 @@ def menuUsuario():
             print("Ingrese una opción válida")
 
 def main (data: Datos):
+    borrarConsola()
     while True:
         print("--------------------")
         print("Menu principal")
