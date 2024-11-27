@@ -5,20 +5,33 @@ import platform
 
 
 # constantes
+MENU_ANALIZAR_RESULTADOS = """
+    --- Analizar resultados ---
+    1. Calcular promedio
+    2. Calcular maximo
+    3. Calcular minimo
+    4. Seleccionar experimentos
+    5. Volver al menu principal
+"""
+SI_NO_OPTION = """
+    1. Si
+    2. No
+"""
 SELECT = "Seleccione una opcion: "
-BADOPTION = "Opcion incorrecta"
-BADINFOREQUEST = "! Datos ingresados no validos"
-WRITEURESPONSE = "Escriba su respuesta: "
+BAD_OPTION = "Opcion incorrecta"
+BAD_INFO_REQUEST = "! Datos ingresados no validos"
+WRITE_U_RESPONSE = "Escriba su respuesta: "
 BARSPACE = "--------------------"
-RETURNTOMENU = "Volver al menu principal"
-FORMATOlETRAS = {
+RETURN_TO_MENU = "Volver al menu principal"
+
+FORMATO_LETRAS = {
     'N': "Nombre del experimento",
     'F': "Fecha del experimento",
     'T': "Tipo de experimento",
     'R': "Resultados del experimento"
 }
 
-def verificar_email(email):
+def verificarEmail(email):
     patron = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(patron, email) is not None
 
@@ -249,7 +262,7 @@ def exportarInforme (informe, usuario):
 
 def mostrarExperimentos (experimentos: list[Experimento]):
     for i, experimento in enumerate(experimentos):
-        print(f"{i+1}. {experimento.nombre}")
+        print(f"{i+1}. {experimento.nombre} - {experimento.tipo}")
     pass
 
 # funcion para menu principal
@@ -265,7 +278,7 @@ def generarInforme (datos: Datos):
         print("1. Exportar informe")
         print("2. Previsualizacion de informe")
         print("3. Seleccionar experimentos para informe")
-        print("4. "+RETURNTOMENU)
+        print("4. "+RETURN_TO_MENU)
         print(BARSPACE)
         response = input(SELECT)
         if response == "1":
@@ -298,8 +311,99 @@ def generarInforme (datos: Datos):
         elif response == "4":
             break
         else:
-            print(BADOPTION)
-                
+            print(BAD_OPTION)
+
+#funciones de analizis de resultados
+def calcularPromedio (experimentos: list[Experimento]):
+    resultado = 0
+    for i, experimento in enumerate(experimentos):
+        resultado += experimento.promedio()
+    
+    resultado /= len(experimentos)
+    print(f"El promedio de los experimentos analizados es: {resultado}")
+    pass
+
+def calcularMaximo (experimentos: list[Experimento]):
+    resultado = 0
+    indexResultado = 0
+    for i, experimento in enumerate(experimentos):
+        maximo = experimento.maximo()
+        if resultado < maximo:
+            resultado = maximo
+            indexResultado = i
+    print(f"El numero maximo de los resultados entre los experimentos analizados es {resultado} del experimento {experimentos[indexResultado].nombre}")
+
+def calcularMinimo (experimentos: list[Experimento]):
+    resultado = 0
+    indexResultado = 0
+    for i, experimento in enumerate(experimentos):
+        minimo = experimento.minimo()
+        if resultado > minimo or resultado == 0:
+            resultado = minimo
+            indexResultado = i
+    print(f"El numero minimo de los resultados entre los experimentos analizados es {resultado} del experimento {experimentos[indexResultado].nombre}")
+
+
+# Funcion para el menu principal
+def analizisResultados (experimentos: list[Experimento]):
+    # variables
+    listaExperimentosAnalizar: list[Experimento] = []
+    
+    def verificacionExperimentos ():
+        print("¿Desea analizar todos los experimentos?")
+        print(SI_NO_OPTION)
+        respuesta = input("")
+        if respuesta == "si" or respuesta == "1" or respuesta == "Si" or respuesta == "SI":
+            for i in range(len(experimentos)):
+                listaExperimentosAnalizar.append(experimentos[i])
+        else:
+            print("Seleccione los experimentos que desea agregar al analisis")
+            mostrarExperimentos(experimentos)
+            isBreak = False
+            while not isBreak:
+                respuestaExperimento = input("")
+                if not respuestaExperimento.isnumeric():
+                    print(BAD_OPTION)
+                    continue
+                respuestaExperimento = int(respuestaExperimento)
+                experimentoSeleccionado = experimentos[respuestaExperimento]
+                if not experimentoSeleccionado in listaExperimentosAnalizar:
+                    listaExperimentosAnalizar.append(experimentoSeleccionado)
+                else:
+                    print("El experimento seleccionado ya esta en la lista para analizar")
+                    continue
+                print("Experimento agregado, ¿desea agregar otro?")
+                print(SI_NO_OPTION)
+                respuesta = input("")
+                if respuesta == "no" or respuesta == "2" or respuesta == "No" or respuesta == "NO":
+                    isBreak = True
+            borrarConsola()
+
+    while True:
+        borrarConsola()
+        print(MENU_ANALIZAR_RESULTADOS)
+        respuesta = input(SELECT)
+
+        if respuesta == "1":
+            if len(listaExperimentosAnalizar) == 0:
+                verificacionExperimentos()
+                pass
+            calcularPromedio(listaExperimentosAnalizar)   
+        elif respuesta == "2":
+            if len(listaExperimentosAnalizar) == 0:
+                verificacionExperimentos()
+            calcularMaximo(listaExperimentosAnalizar)
+        elif respuesta == "3":
+            if len(listaExperimentosAnalizar) == 0:
+                verificacionExperimentos()
+            calcularMinimo(listaExperimentosAnalizar)
+        elif respuesta == "4":
+            verificacionExperimentos()
+        elif respuesta == "5":
+            break
+        else:
+            print(BAD_OPTION)
+    pass
 
 def configuracion (usuario, datos: Datos):
     borrarConsola()
@@ -316,7 +420,7 @@ def configuracion (usuario, datos: Datos):
         print("Formato de exportacion, (orden de la informacion): ")
         for i in range(len(formato_split)):
             letra = formato_split[i]
-            print(f"{i+1}. {FORMATOlETRAS[letra]}")
+            print(f"{i+1}. {FORMATO_LETRAS[letra]}")
 
         print("Escriba el nombre de exportacion de su archivo, si no desea cambiarlo precione enter sin escribir nada")
         respuesta = input()
@@ -330,10 +434,10 @@ def configuracion (usuario, datos: Datos):
             if respuesta == "1" or respuesta == "si" or respuesta == "Si" or respuesta == "SI":
                 print("Escriba el orden en que quiera que se ordenen los datos en el informe, separados por guiones")
                 print("Ejemplo: 2-1-4-3")
-                print(f"1. {FORMATOlETRAS['N']}")
-                print(f"2. {FORMATOlETRAS['T']}")
-                print(f"3. {FORMATOlETRAS['F']}")
-                print(f"4. {FORMATOlETRAS['R']}")
+                print(f"1. {FORMATO_LETRAS['N']}")
+                print(f"2. {FORMATO_LETRAS['T']}")
+                print(f"3. {FORMATO_LETRAS['F']}")
+                print(f"4. {FORMATO_LETRAS['R']}")
                 while True:
                     response = input(SELECT)
                     try:
@@ -347,23 +451,23 @@ def configuracion (usuario, datos: Datos):
                         usuario['formatoArchivo'] = formato
                         break
                     except ValueError:
-                        print(BADINFOREQUEST)
+                        print(BAD_INFO_REQUEST)
                     
             elif respuesta == "2" or respuesta == "no" or respuesta == "No" or respuesta == "NO":
                 break
             else:
-                print(BADOPTION)
+                print(BAD_OPTION)
         return
 
 
     def optionSecure ():
         print("Por favor ingrese la contraseña para poder cambiarla (De enter sin escribir nada para cancelar)")
-        response = input(WRITEURESPONSE)
+        response = input(WRITE_U_RESPONSE)
         if response == "":
             return
         if response == usuario['clave']:
             print("Escriba la nueva contraseña")
-            nuevaClave = input(WRITEURESPONSE)
+            nuevaClave = input(WRITE_U_RESPONSE)
             usuario['clave'] = nuevaClave
             print("** Contraseña cambiada con exito **")
                 
@@ -390,7 +494,7 @@ def configuracion (usuario, datos: Datos):
         print("2. Opciones de seguridad")
         print("3. Restablecer base de datos")
         print("4. Ver datos de usuario")
-        print("5. "+RETURNTOMENU)
+        print("5. "+RETURN_TO_MENU)
         print(BARSPACE)
         respuesta = input(SELECT)
         if respuesta == "1":
@@ -404,7 +508,7 @@ def configuracion (usuario, datos: Datos):
         elif respuesta == "5":
             break
         else:
-            print(BADOPTION)
+            print(BAD_OPTION)
     
     return
 
@@ -431,7 +535,7 @@ def menuUsuario():
                 continue
             print("Correo electrónico:")
             correo = input()
-            if not verificar_email(correo):
+            if not verificarEmail(correo):
                 print(f"{correo} no es un correo electrónico válido.")
                 continue
             print("Ingrese una clave:")
@@ -507,7 +611,7 @@ def main (data: Datos):
             data.guardar()
             break
         else:
-            print(BADOPTION)
+            print(BAD_OPTION)
 
 if __name__ == "__main__":
     menuUsuario()
