@@ -119,7 +119,9 @@ class Datos:
                 datos_resultados = int(input("¿Cuántos datos desea almacenar en los resultados? "))
                 for i in range(datos_resultados):
                     dato_resultado = input(f"Ingrese el resultado {i + 1}: ")
-                    resultados.append(dato_resultado)
+                    flotante = isFloat(dato_resultado)
+                    if flotante != False:
+                        resultados.append(flotante)
                 break
             elif confirm_Realiz_Experimento == "no":
                 fecha = input("Ingrese la fecha en que realizará su experimento (YYYY-MM-DD): ")
@@ -215,6 +217,13 @@ def borrarConsola():
     else:
         os.system('clear')
 
+
+def isFloat (string):
+    try:
+        return float(string)
+    except:
+        return False
+
 def obtenerInforme (indexs: list[int], datos: Datos):
     # declaramos esta variable que va a almacenar todos los experimentos que seran detallados en el informe
     paraInforme: list[Experimento] = []
@@ -236,10 +245,10 @@ def obtenerInforme (indexs: list[int], datos: Datos):
             paraInforme.append(experimento)
     
     for i, experimento in enumerate(paraInforme):
-        informe += f"Experimento numero {i+1} \n"
+        informe += f"\n \nExperimento numero {i+1} \n"
         resultados = "|"
         for h in range(len(experimento.resultados)):
-            resultados += experimento.resultados[h] + "|"
+            resultados += str(experimento.resultados[h]) + "|"
         for j in range(len(formatoInforme)):
             seccion = formatoInforme[j]
             if seccion == "N":
@@ -379,8 +388,8 @@ def analizisResultados (experimentos: list[Experimento]):
                     isBreak = True
             borrarConsola()
 
+    borrarConsola()
     while True:
-        borrarConsola()
         print(MENU_ANALIZAR_RESULTADOS)
         respuesta = input(SELECT)
 
@@ -604,8 +613,12 @@ def main (data: Datos):
         respuesta = input(SELECT)
         if respuesta == "1":
             data.agregarExperimento()
+        elif respuesta == "6":
+            analizisResultados(data.experimentos)
+        elif respuesta == "7":
+            generarInforme(data)
         elif respuesta == "8":
-            configuracion(data.obtenerUsuario())
+            configuracion(data.obtenerUsuario(), data)
         elif respuesta == "9":
             print("Saliendo del programa...")
             data.guardar()

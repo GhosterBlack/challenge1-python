@@ -10,4 +10,9 @@ ivan@gmail.com
 Recoleccion de zetas
 ~2024-11-22 00:00:00
 ~micologia
-~['3', '5']
+~[3, 5]
+----
+Revision de crecimiento
+~2024-11-27 00:00:00
+~botanica
+~[7.0, 8.0, 6.0]
