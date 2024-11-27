@@ -1,19 +1,9 @@
-# Importamos librerías y módulos necesarios
-import re  # Para trabajar con expresiones regulares, validaciones de formato
-import getpass  # Para gestionar contraseñas de manera segura (ocultas al ingreso)
-import bcrypt  # Para encriptar y verificar contraseñas de forma segura
-from datetime import datetime  # Para trabajar con fechas y horas
-import os  # Para interactuar con el sistema operativo (por ejemplo, borrar consola)
-import platform  # Para obtener información sobre el sistema operativo
+import re
+import getpass
+import bcrypt
+from datetime import datetime
 
-# Creamos constantes para los menús de interacción con el usuario
-MENU_LOGIN = """
---- Menú de Login ---
-1. Iniciar Sesión
-2. Registrarse
-3. Salir
-"""
-
+# Definición de los menús, que se usan más adelante en las funciones principales.
 MENU_PRINCIPAL = """
 Menu principal
 1. Agregar experimento
@@ -25,7 +15,6 @@ Menu principal
 7. Salir
 """
 
-# Menú para agregar experimentos
 MENU_AGREGAR_EXPERIMENTO = """
 --- Menú Agregar Experimento ---
 1. Ingresar Nombre del Experimento
@@ -34,7 +23,6 @@ MENU_AGREGAR_EXPERIMENTO = """
 4. Cancelar
 """
 
-# Menú para ver experimentos
 MENU_VER_EXPERIMENTOS = """
 --- Menú Ver Experimentos ---
 1. Ver Todos los Experimentos
@@ -44,7 +32,6 @@ MENU_VER_EXPERIMENTOS = """
 5. Volver al Menú Principal
 """
 
-# Menú para análisis de resultados
 MENU_ANALISIS_RESULTADOS = """
 --- Menú Análisis de Resultados ---
 1. Calcular Promedio
@@ -54,7 +41,6 @@ MENU_ANALISIS_RESULTADOS = """
 5. Volver al Menú Principal
 """
 
-# Menú para generar informes
 MENU_GENERAR_INFORME = """
 --- Menú Generar Informe ---
 1. Generar Informe Completo
@@ -64,226 +50,304 @@ MENU_GENERAR_INFORME = """
 5. Volver al Menú Principal
 """
 
-# Menú de configuración
 MENU_CONFIGURACION = """
 --- Menú Configuración ---
 1. Opciones de Exportación
 2. Opciones de Seguridad
 3. Restablecer Base de Datos
-4. Volver al Menú Principal
+4. Ver Datos de Usuario
+5. Volver al Menú Principal
 """
 
-# Constantes extras para la interacción
-SELECT = "Seleccione una opcion: "
-BADOPTION = "Opcion incorrecta"
-BADINFOREQUEST = "! Datos ingresados no validos"
-WRITEURESPONSE = "Escriba su respuesta: "
-BARSPACE = "--------------------"
-RETURNTOMENU = "Volver al menu principal"
-FORMATOlETRAS = {
-    'N': "Nombre del experimento",
-    'F': "Fecha del experimento",
-    'T': "Tipo de experimento",
-    'R': "Resultados del experimento"
-}
+MENU_LOGIN = """
+--- Menú de Login ---
+1. Registrarse
+2. Iniciar Sesión
+3. Salir
+"""
 
-# Función para borrar la consola dependiendo del sistema operativo
-def borrarConsola():
-    if platform.system() == "Windows":
-        os.system('cls')  # Si es Windows, usar 'cls' para limpiar la consola
-    else:
-        os.system('clear')  # Si es Linux/Mac, usar 'clear' para limpiar la consola
-
-# Clase para almacenar y gestionar los datos de usuarios y experimentos
+# Clase que maneja los datos principales del sistema (experimentos, usuarios, etc.).
 class Datos:
     def __init__(self):
-        self.experimentos = []  # Lista para almacenar los experimentos
-        self.usuarios = {  # Diccionario para almacenar los usuarios registrados
+        # Lista de experimentos y un diccionario de usuarios.
+        self.experimentos = []
+        self.usuarios = {
             "EdIv": {
-                "contraseña": self.hash_password("Ediv-7*"),  # Contraseña hasheada
+                "contraseña": self.hash_password("EdIv1025*"),
                 "telefono": "3122003538",
-                "correo": "ediv@example.com"
+                "nombreArchivo": "",
+                "formatoArchivo": "",
+                "clave": "EdIv1025*",
+                "nombre": "Ed",
+                "apellido": "Iv",
+                "correo": "ediv1025@gmail.com"
             }
         }
 
-    # Función para validar un correo electrónico con expresión regular
-    def validar_correo(self, correo):
-        return bool(re.match(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', correo))
-
-    # Agregar un nuevo experimento a la lista
     def agregar_experimento(self, experimento):
+        """Agregar un nuevo experimento a la lista."""
         self.experimentos.append(experimento)
 
-    # Agregar un nuevo usuario con sus datos: usuario, contraseña, teléfono y correo
-    def agregar_usuario(self, usuario, contraseña, telefono, correo):
-        self.usuarios[usuario] = {"contraseña": contraseña, "telefono": telefono, "correo": correo}
+    def agregar_usuario(self, usuario, contraseña, telefono, nombreArchivo, formatoArchivo):
+        """Agregar un nuevo usuario al sistema."""
+        self.usuarios[usuario] = {"contraseña": contraseña, "telefono": telefono,
+                                   "nombreArchivo": nombreArchivo, "formatoArchivo": formatoArchivo}
 
-    # Obtener la lista de experimentos
     def obtener_experimentos(self):
+        """Obtener la lista de experimentos."""
         return self.experimentos
 
-    # Obtener la lista de usuarios
     def obtener_usuarios(self):
+        """Obtener la lista de usuarios."""
         return self.usuarios
 
-    # Método para visualizar todos los experimentos registrados
+    def obtener_usuario(self, usuario):
+        """Obtener los detalles de un usuario específico."""
+        return self.usuarios.get(usuario)
+
     def ver_experimentos(self):
+        """Mostrar todos los experimentos registrados."""
         for experimento in self.experimentos:
             experimento.ver_experimento()
 
-    # Método para visualizar todos los usuarios registrados
-    def ver_usuarios(self):
-        for usuario, datos in self.usuarios.items():
-            print(f"Usuario: {usuario}, Correo: {datos['correo']}, Teléfono: {datos['telefono']}")
-
-    # Función para encriptar contraseñas usando bcrypt
     def hash_password(self, password):
-        salt = bcrypt.gensalt()  # Genera un 'salt' aleatorio para la encriptación
-        hashed = bcrypt.hashpw(password.encode(), salt)  # Hashea la contraseña con el salt
+        """Generar el hash de una contraseña usando bcrypt."""
+        salt = bcrypt.gensalt()
+        hashed = bcrypt.hashpw(password.encode(), salt)
         return hashed
 
-    # Función para verificar si una contraseña ingresada coincide con una contraseña hasheada
     def check_password(self, hashed, password):
+        """Verificar si una contraseña coincide con su hash."""
         return bcrypt.checkpw(password.encode(), hashed)
 
-    # Guardar usuarios y experimentos en un archivo de texto
-    def guardar(self):
-        if len(self.usuarios) == 0 and len(self.experimentos) == 0:
-            return  # Si no hay datos, no guardamos nada
-        
-        text = ""  # Inicializamos la variable que almacenará la información
-        
-        # Escribimos los datos de los usuarios en el archivo
-        if len(self.usuarios) > 0:
-            for i, usuario in self.usuarios.items():
-                text += f"\n{usuario['correo']}\n~{usuario['contraseña']}\n~{usuario['telefono']}"
-                if i != len(self.usuarios) - 1:
-                    text += "\n----"  # Separador entre usuarios
-        else:
-            text += "usuario~\n0000"
-        
-        # Escribimos los experimentos si existen
-        if len(self.experimentos) > 0:
-            text += "\n####"
-            for i, experimento in enumerate(self.experimentos):
-                text += f"\n{experimento.nombre}\n~{experimento.fecha}\n~{experimento.tipo}\n~{str(experimento.resultados)}"
-                if i != len(self.experimentos) - 1:
-                    text += "\n----"
-        
-        # Guardamos la información en el archivo 'datos.txt'
-        with open("datos.txt", "w") as archivo:
-            archivo.write(text)
-        print("Datos guardados correctamente.")  # Confirmación de que los datos fueron guardados
+    def validar_nombre_usuario(self, nombre):
+        """Validar el formato del nombre del usuario (solo letras y espacio)."""
+        return bool(re.match(r'^[A-Z][a-z]*(?: [A-Z][a-z]*)*$', nombre))
 
-    # Limpiar la lista de experimentos y guardar los cambios
-    def clear(self):
-        self.experimentos = []  # Limpiar la lista de experimentos
-        self.guardar()  # Guardar los cambios (sin experimentos) en el archivo
+    def validar_telefono(self, telefono):
+        """Validar el formato del número de teléfono (10 dígitos)."""
+        return bool(re.match(r'^\d{10}$', telefono))
 
-# Clase que maneja las operaciones del sistema de usuarios
-class SistemaDeUsuarios:
+    def validar_contraseña(self, contraseña):
+        """Validar el formato de la contraseña (mínimo 8 caracteres, letras, números y símbolo)."""
+        return bool(re.match(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[*_\-])[A-Za-z\d*_\-]{8,}$', contraseña))
+
+# Clase que maneja los experimentos registrados en el sistema.
+class Experimento:
+    def __init__(self, nombre, fecha, tipo, resultados):
+        # Atributos que definen un experimento.
+        self.nombre = nombre
+        self.fecha = fecha
+        self.tipo = tipo
+        self.resultados = resultados
+        self.historial = []
+
+    def editar_experimento(self, nuevo_nombre, nueva_fecha, nuevo_tipo, nuevos_resultados):
+        """Editar los datos de un experimento y registrar los cambios en el historial."""
+        self.historial.append({
+            'nombre': self.nombre,
+            'fecha': self.fecha,
+            'tipo': self.tipo,
+            'resultados': self.resultados
+        })
+        self.nombre = nuevo_nombre
+        self.fecha = nueva_fecha
+        self.tipo = nuevo_tipo
+        self.resultados = nuevos_resultados
+
+    def ver_experimento(self):
+        """Mostrar los detalles de un experimento."""
+        print(f"Nombre: {self.nombre}")
+        print(f"Fecha: {self.fecha}")
+        print(f"Tipo: {self.tipo}")
+        print("Resultados:")
+        for i, resultado in enumerate(self.resultados):
+            print(f"{i + 1}. {resultado}")
+        print("Historial de cambios:")
+        for cambio in self.historial:
+            print(cambio)
+
+# Clase principal que gestiona los experimentos y su interacción con el usuario.
+class AsistenteDeExperimentos:
     def __init__(self, datos):
-        self.datos = datos  # Recibe una instancia de la clase Datos
+        self.datos = datos
 
-    # Registro de un nuevo usuario
-    def registrar_usuario(self):
-        print("\n--- Registro de Usuario ---")
-        usuario = input("Ingrese un nombre de usuario: ")
-        
-        # Validación de nombre de usuario con formato
-        if not self.datos.validar_nombre_usuario(usuario):
-            print("El nombre de usuario debe contener mayúsculas al comienzo y después de cada espacio.")
-            return
+    def agregar_experimento(self):
+        """Función para agregar un nuevo experimento."""
+        nombre = input("Ingrese el nombre del experimento: ")
+        tipo = input("Ingrese el tipo de experimento: ")
+        fecha = ""
+        resultados = []
 
-        correo = input("Ingrese su correo electrónico: ")
-        
-        # Validación de formato de correo
-        if not self.datos.validar_correo(correo):
-            print("El correo electrónico no tiene un formato válido.")
-            return
-
-        telefono = input("Ingrese su número de teléfono (10 dígitos): ")
-        
-        # Validación de número de teléfono
-        if not self.datos.validar_telefono(telefono):
-            print("El número de teléfono debe tener 10 dígitos.")
-            return
-
-        contraseña = getpass.getpass("Ingrese una contraseña: ")
-        
-        # Validación de contraseña (debe cumplir con ciertos requisitos)
-        if not self.datos.validar_contraseña(contraseña):
-            print("La contraseña debe tener al menos una mayúscula, una minúscula, números y al menos un carácter especial (*_-).")
-            return
-
-        hashed_contraseña = self.datos.hash_password(contraseña)  # Hasheamos la contraseña
-        self.datos.agregar_usuario(usuario, hashed_contraseña, telefono, correo)  # Registramos el usuario
-        print("Usuario registrado exitosamente.")
-
-    # Iniciar sesión de un usuario
-    def iniciar_sesion(self):
-        if not self.datos.obtener_usuarios():
-            print("No hay usuarios registrados. Por favor, registre un usuario primero.")
-            return False
-
-        print("\n--- Inicio de Sesión ---")
-        login_input = input("Ingrese su usuario o correo electrónico: ")
-        contraseña = getpass.getpass("Contraseña: ")
-
-        # Verificamos si el login corresponde a un usuario o correo
-        usuario_data = None
-        for usuario, datos in self.datos.obtener_usuarios().items():
-            if usuario == login_input or datos['correo'] == login_input:
-                usuario_data = datos
-                break
-
-        if usuario_data and self.datos.check_password(usuario_data["contraseña"], contraseña):  # Verificación de contraseña
-            print("Inicio de sesión exitoso.")
-            return True
-        else:
-            print("Usuario o correo electrónico, o contraseña incorrectos.")
-            return False
-
-    # Menú de inicio de sesión
-    def menu_login(self):
         while True:
-            print(MENU_LOGIN)
+            print("¿Ya realizó el experimento? (si/no)")
+            confirm_Realiz_Experimento = input().strip().lower()
+            if confirm_Realiz_Experimento == "si":
+                fecha = input("Ingrese la fecha en que realizó el experimento (YYYY-MM-DD): ")
+                if not self.validar_fecha(fecha):
+                    print("Fecha inválida. Intente de nuevo.")
+                    continue
+                datos_resultados = int(input("¿Cuántos datos desea almacenar en los resultados? "))
+                for i in range(datos_resultados):
+                    dato_resultado = input(f"Ingrese el resultado {i + 1}: ")
+                    resultados.append(dato_resultado)
+                break
+            elif confirm_Realiz_Experimento == "no":
+                fecha = input("Ingrese la fecha en que realizará su experimento (YYYY-MM-DD): ")
+                if not self.validar_fecha(fecha):
+                    print("Fecha inválida. Intente de nuevo.")
+                    continue
+                break
+            else:
+                print("Solo puede escoger: si o no")
+
+        experimento = Experimento(nombre, fecha, tipo, resultados)
+        self.datos.agregar_experimento(experimento)
+        print("Experimento agregado exitosamente.")
+
+    def validar_fecha(self, fecha):
+        """Validar el formato de la fecha del experimento (YYYY-MM-DD)."""
+        try:
+            datetime.strptime(fecha, '%Y-%m-%d')
+            return True
+        except ValueError:
+            return False
+
+    def ver_experimentos(self):
+        """Mostrar todos los experimentos registrados."""
+        self.datos.ver_experimentos()
+
+    def menu_principal(self):
+        """Mostrar el menú principal del asistente de experimentos."""
+        while True:
+            print(MENU_PRINCIPAL)
             opcion = input("Seleccione una opción: ")
 
             if opcion == '1':
-                self.registrar_usuario()  # Registrar un nuevo usuario
+                self.agregar_experimento()
             elif opcion == '2':
-                if self.iniciar_sesion():  # Iniciar sesión si los datos son correctos
-                    return True
+                self.ver_experimentos()
             elif opcion == '3':
+                self.analisis_de_resultados()
+            elif opcion == '4':
+                self.generar_informe()
+            elif opcion == '5':
+                self.configuracion()
+            elif opcion == '6':
+                print("Cerrando sesión...")
+                return
+            elif opcion == '7':
                 print("Saliendo...")
-                return False  # Salir del programa
+                exit()
             else:
-                print("Opción inválida. Intente de nuevo.")  # Manejo de opciones inválidas
+                print("Opción inválida. Intente de nuevo.")
 
-# Menú principal (Lógica de interacción con el usuario una vez que haya iniciado sesión)
-def menu_principal(self):
-    while True:
-        borrarConsola()  # Limpiar la consola
-        print(MENU_PRINCIPAL)  # Mostrar el menú principal
-        opcion = input("Seleccione una opción: ")
+    def analisis_de_resultados(self):
+        """Mostrar el menú de análisis de resultados."""
+        while True:
+            print(MENU_ANALISIS_RESULTADOS)
+            opcion = input("Seleccione una opción: ")
 
-        # Dependiendo de la opción, ejecutamos la acción correspondiente
-        if opcion == '1':
-            self.agregar_experimento()
-        elif opcion == '2':
-            self.ver_experimentos()
-        elif opcion == '3':
-            self.analisis_de_resultados()
-        elif opcion == '4':
-            self.generar_informe()
-        elif opcion == '5':
-            self.configuracion()
-        elif opcion == '6':
-            print("Cerrando sesión...")
-            return  # Salir de la sesión
-        elif opcion == '7':
-            print("Saliendo...")
-            exit()  # Salir del programa
-        else:
-            print("Opción inválida. Intente de nuevo.")  # Manejo de opciones inválid
+            if opcion == '1':
+                self.calcular_promedio()
+            elif opcion == '2':
+                self.calcular_maximo()
+            elif opcion == '3':
+                self.calcular_minimo()
+            elif opcion == '4':
+                self.ver_analisis_completo()
+            elif opcion == '5':
+                return
+            else:
+                print("Opción inválida. Intente de nuevo.")
+
+    def calcular_promedio(self):
+        """Calcular el promedio de los resultados de los experimentos."""
+        print("Calculando el promedio...")
+
+    def calcular_maximo(self):
+        """Calcular el máximo de los resultados de los experimentos."""
+        print("Calculando el máximo...")
+
+    def calcular_minimo(self):
+        """Calcular el mínimo de los resultados de los experimentos."""
+        print("Calculando el mínimo...")
+
+    def ver_analisis_completo(self):
+        """Ver análisis completos de los experimentos."""
+        print("Mostrando el análisis completo...")
+
+    def generar_informe(self):
+        """Mostrar el menú para generar el informe de los experimentos."""
+        while True:
+            print(MENU_GENERAR_INFORME)
+            opcion = input("Seleccione una opción: ")
+
+            if opcion == '1':
+                self.exportar_informe()
+            elif opcion == '2':
+                self.seleccionar_experimentos_para_informe()
+            elif opcion == '3':
+                self.exportar_informe_a_txt()
+            elif opcion == '4':
+                self.vista_previa_informe()
+            elif opcion == '5':
+                return
+            else:
+                print("Opción inválida. Intente de nuevo.")
+
+    def exportar_informe(self):
+        """Exportar el informe completo de experimentos."""
+        print("Exportando el informe...")
+
+    def seleccionar_experimentos_para_informe(self):
+        """Seleccionar qué experimentos incluir en el informe."""
+        print("Seleccionando experimentos para el informe...")
+
+    def exportar_informe_a_txt(self):
+        """Exportar el informe a un archivo .txt"""
+        print("Informe exportado a archivo de texto...")
+
+    def vista_previa_informe(self):
+        """Mostrar una vista previa del informe."""
+        print("Mostrando vista previa del informe...")
+
+    def configuracion(self):
+        """Mostrar el menú de configuración."""
+        while True:
+            print(MENU_CONFIGURACION)
+            opcion = input("Seleccione una opción: ")
+
+            if opcion == '1':
+                self.opciones_de_exportacion()
+            elif opcion == '2':
+                self.opciones_de_seguridad()
+            elif opcion == '3':
+                self.restablecer_base_de_datos()
+            elif opcion == '4':
+                self.ver_datos_usuario()
+            elif opcion == '5':
+                return
+            else:
+                print("Opción inválida. Intente de nuevo.")
+
+    def opciones_de_exportacion(self):
+        """Mostrar opciones de exportación de informes."""
+        print("Configurando opciones de exportación...")
+
+    def opciones_de_seguridad(self):
+        """Mostrar opciones de seguridad."""
+        print("Configurando opciones de seguridad...")
+
+    def restablecer_base_de_datos(self):
+        """Restablecer la base de datos."""
+        print("Restableciendo base de datos...")
+
+    def ver_datos_usuario(self):
+        """Ver los datos del usuario."""
+        print("Mostrando datos del usuario...")
+
+# Crear los datos e iniciar la aplicación
+datos = Datos()
+asistente = AsistenteDeExperimentos(datos)
+asistente.menu_principal()
