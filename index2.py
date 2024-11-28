@@ -1,6 +1,6 @@
 import re
 import getpass
-import bcrypt
+import hashlib
 from datetime import datetime
 import os
 import platform
@@ -67,26 +67,30 @@ MENU_ANALIZAR_RESULTADOS = """
     4. Seleccionar experimentos
     5. Volver al menu principal
 """
+# Clase para manejar los experimentos
+class Experimento:
+    resultados: list[float] = []
 
-# Función para limpiar consola
-def borrarConsola():
-    if platform.system() == "Windows":
-        os.system('cls')
-    else:
-        os.system('clear')
+    def promedio(self):
+        return sum(self.resultados) / len(self.resultados)
 
-# Función para verificar entradas flotantes
-def isFloat (string):
-    try:
-        return float(string)
-    except:
-        return False
+    def minimo(self):
+        return min(self.resultados)
+
+    def maximo(self):
+        return max(self.resultados)
+    
+    def __init__(self, nombre, fecha, tipo, resultados = []):
+        self.nombre = nombre
+        self.fecha = fecha
+        self.tipo = tipo
+        self.resultados = resultados
 
 # Clase donde almacenamos los datos
 class Datos:
     
     usuarios = []
-    experimentos = []
+    experimentos: list[Experimento] = []
     usuario = None
 
     def obtenerUsuario(self):
@@ -99,10 +103,12 @@ class Datos:
         except:
             return False
 
-    def agregarUsuario(self, correo: str, clave: str, telefono: str, nombre: str, apellido: str):
+    def agregarUsuario (self, correo: str, clave: str, nombreArchivo: str, formatoArchivo: str, telefono: str, nombre: str, apellido: str):
         usuario = {
             'correo': correo,
             'clave': clave,
+            'nombreArchivo': nombreArchivo,
+            'formatoArchivo': formatoArchivo,
             'telefono': telefono,
             'nombre': nombre,
             'apellido': apellido
@@ -111,8 +117,7 @@ class Datos:
         print("*** Usuario agregado con exito ***")
         return usuario
     
-    @staticmethod
-    def verificarEmail(email):
+    def verificarEmail(self, email):
         patron = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         return re.match(patron, email) is not None
 
@@ -128,8 +133,8 @@ class Datos:
         if len(self.usuarios) > 0:
             for i in range(len(self.usuarios)):
                 usuario = self.usuarios[i]
-                text += f"\n{usuario['correo']}\n~{usuario['clave']}\n~{usuario['telefono']}"
-                text += f"\n~{usuario['nombre']}\n~{usuario['apellido']}"
+                text += f"\n{usuario['correo']}\n~{usuario['clave']}\n~{usuario['nombreArchivo']}\n~{usuario['formatoArchivo']}"
+                text += f"\n~{usuario['telefono']}\n~{usuario['nombre']}\n~{usuario['apellido']}"
                 if i < len(self.usuarios)-1:
                     text += "\n----"
         else:
@@ -166,9 +171,11 @@ class Datos:
                     usuario = {
                         'correo': usuario_list[0],
                         'clave': usuario_list[1],
-                        'telefono': usuario_list[2],
-                        'nombre': usuario_list[3],
-                        'apellido': usuario_list[4]
+                        'nombreArchivo': usuario_list[2],
+                        'formatoArchivo': usuario_list[3],
+                        'telefono': usuario_list[4],
+                        'nombre': usuario_list[5],
+                        'apellido': usuario_list[6]
                     }
                     if usuario['correo'] != "usuario":
                         self.usuarios.append(usuario)
@@ -181,50 +188,70 @@ class Datos:
                         experimento.resultados = eval(experimento_list[3])
                         self.experimentos.append(experimento)
 
-# Clase para manejar los experimentos
-class Experimento:
-    resultados: list[float] = []
-
-    def promedio(self):
-        return sum(self.resultados) / len(self.resultados)
-
-    def minimo(self):
-        return min(self.resultados)
-
-    def maximo(self):
-        return max(self.resultados)
-    
-    def __init__(self, nombre, fecha, tipo, resultados = []):
-        self.nombre = nombre
-        self.fecha = fecha
-        self.tipo = tipo
-        self.resultados = resultados
-
 # Clase que maneja las operaciones del sistema de usuarios
 class SistemaDeUsuarios:
     def __init__(self, datos):
-        self.datos = datos  # Recibe una instancia de la clase Datos
+        self.datos: Datos = datos  # Recibe una instancia de la clase Datos
 
     def registrarUsuario(self):
-        # Código de registro...
+        borrarConsola()
+        while True:
+            print("Ingrese su nombre:")
+            nombre = input()
+            if not (nombre.isalpha() and len(nombre) > 2):
+                continue
+            print("Ingrese su apellido:")
+            apellido = input()
+            if not (apellido.isalpha() and len(apellido) > 2):
+                continue
+            print("Correo electrónico:")
+            correo = input()
+            if not self.datos.verificarEmail(correo):
+                print(f"{correo} no es un correo electrónico válido.")
+                continue
+            print("Ingrese una clave:")
+            clave = input()
+            while 8 <= len(clave) <= 20:
+                print("Confirme clave:")
+                claveConfirmada = input()
+                if clave == claveConfirmada:
+                    break
+                else:
+                    print("Las claves no coinciden.")
+            else:
+                print("La clave debe tener entre 8 y 20 caracteres.")
+            print("Ingrese su número de teléfono:")
+            telefono = input()
+            if len(telefono) != 10:
+                continue
+
+            hashObj = hashlib.sha256(clave.encode('utf-8'))
+            datos.agregarUsuario(correo, hashObj.hexdigest(), "", "", telefono, nombre, apellido)
+            datos.guardar()
+            print("Datos guardados exitosamente")
+            break
+
         pass
 
     def iniciarSesion(self):
+        borrarConsola()
         print("\n--- Iniciar Sesión ---")
         login_input = input("Ingrese su nombre de usuario o correo electrónico: ")
         contraseña = getpass.getpass("Contraseña: ")
+        hashObj = hashlib.sha256(contraseña.encode('utf-8'))
+        print(hashObj.hexdigest())
 
         # Buscar si el login_input es un nombre de usuario o un correo
         usuario_data = None
         
         # Verificar si el input es un correo electrónico
-        if Datos.verificarEmail(login_input):  # Si es un correo
+        if self.datos.verificarEmail(login_input):  # Si es un correo
             usuario_data = next((u for u in self.datos.usuarios if u['correo'] == login_input), None)
         else:  # Si no es un correo, asumimos que es un nombre de usuario
             usuario_data = next((u for u in self.datos.usuarios if u['nombre'] == login_input), None)
         
         # Verificar si el usuario existe y la contraseña es correcta
-        if usuario_data and bcrypt.checkpw(contraseña.encode('utf-8'), usuario_data['clave'].encode('utf-8')):
+        if usuario_data and usuario_data['clave'] == hashObj.hexdigest():
             print("Inicio de sesión exitoso.")
             self.datos.usuario = self.datos.usuarios.index(usuario_data)  # Guardamos el índice del usuario
             return True
@@ -233,7 +260,6 @@ class SistemaDeUsuarios:
             return False
 
     def cerrarSesion(self):
-        """Cerrar sesión del usuario actual y guardar los datos."""
         if self.datos.usuario is not None:
             # Limpiar la sesión actual
             usuario = self.datos.obtenerUsuario()
@@ -247,26 +273,49 @@ class SistemaDeUsuarios:
             return False
 
     def menuLogin(self):
-        while True:
+        isBreak = False
+        while not isBreak:
             print(MENU_LOGIN)
             opcion = input(SELECT)
 
             if opcion == '1':
                 self.registrarUsuario()  # Registrar un nuevo usuario
             elif opcion == '2':
-                if self.iniciarSesion():  # Iniciar sesión si los datos son correctos
-                    return True
+                isBreak = True
+                return self.iniciarSesion()
             elif opcion == '3':
                 print("Saliendo...")
+                isBreak = True
                 return False  # Salir del programa
             else:
                 print(BAD_OPTION)  # Manejo de opciones inválidas
+# funciones de herramientas
+# Función para limpiar consola
+def borrarConsola():
+    if platform.system() == "Windows":
+        os.system('cls')
+    else:
+        os.system('clear')
+
+# Función para verificar entradas flotantes
+def isFloat (string):
+    try:
+        return float(string)
+    except:
+        return False
+
+# este encriptado no es el mejor, pero funciona
+def encode (cadena):
+    pass
+
 
 # Función de menú principal
 def main(data: Datos):
     sistema = SistemaDeUsuarios(data)  # Crear la instancia de SistemaDeUsuarios
-
-    while True:
+    inicio = sistema.menuLogin()
+    if not inicio:
+        print("No ha podido iniciar sesion intente de nuevo.")
+    while inicio:
         borrarConsola()
         if data.usuario is not None:
             usuario = data.obtenerUsuario()
@@ -688,5 +737,7 @@ def configuracion (usuario, datos: Datos):
     return
 
 
-
+if __name__ == "__main__":
+    datos = Datos()
+    main(datos)
 
