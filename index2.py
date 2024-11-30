@@ -313,10 +313,6 @@ def isFloat (string):
     except:
         return False
 
-# este encriptado no es el mejor, pero funciona
-def encode (cadena):
-    pass
-
 
 # Función de menú principal
 def main(data: Datos):
@@ -454,6 +450,40 @@ def verExperimentos(data: Datos):
             return  # Volver al menú principal
         else:
             print(BAD_OPTION)
+
+# esta es la parte de editar experimentos
+
+def editarResultado (experimento: Experimento):
+    while True:
+        resultados = experimento.resultados
+        print("-- Editar resultados de experimentos --")
+        print("¿Que desea hacer?")
+        print("1. Borrar entradas")
+        print("2. Agregar entrada")
+        print("3. Salir")
+        respuesta = input(SELECT)
+        if respuesta == "1":
+            print("¿Cual entrada desea borrar?")
+            for i, result in enumerate(resultados):
+                print(f"{i+1}. {result}")
+            borrar = input(SELECT)
+            if not borrar.isnumeric():
+                print(BAD_OPTION)
+                continue
+            borrar = int(borrar)
+            resultados.pop(borrar)
+            print("Resultado Borrado")
+        if respuesta == "2":
+            entrada = input("Escriba el valor de la nueva entrada: ")
+            entrada = isFloat(entrada)
+            if entrada != False:
+                resultados.append(entrada)
+                print("Datos ingresados con exito !!")
+            else:
+                print(BAD_INFO_REQUEST)
+            
+
+    pass
 
 # Opcion 3
 def editarExperimentos (data: Datos):
