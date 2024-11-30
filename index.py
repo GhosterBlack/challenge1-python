@@ -360,6 +360,8 @@ def main(data: Datos):
                 if sistema.cerrarSesion():  # Llamamos a la función cerrarSesion
                     print("Sesión cerrada con éxito.")
                     input("Presione enter para continuar...")
+                    borrarConsola()
+                    inicio = sistema.menuLogin()
             else:
                 print("No hay sesión activa.")
                 input("Presione enter para continuar...")
@@ -369,6 +371,7 @@ def main(data: Datos):
             break
         else:
             print(BAD_OPTION)
+
 
 # Funciones para la interaccion del usuario con el asistente de experimentos
 
@@ -561,7 +564,7 @@ def analizisResultados (experimentos: list[Experimento]):
                 if not respuestaExperimento.isnumeric():
                     print(BAD_OPTION)
                     continue
-                respuestaExperimento = int(respuestaExperimento)
+                respuestaExperimento = int(respuestaExperimento) - 1
                 experimentoSeleccionado = experimentos[respuestaExperimento]
                 if not experimentoSeleccionado in listaExperimentosAnalizar:
                     listaExperimentosAnalizar.append(experimentoSeleccionado)

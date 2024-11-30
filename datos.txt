@@ -32,3 +32,8 @@ Revision de crecimiento
 ~2024-11-27 00:00:00
 ~botanica
 ~[7.0, 8.0, 6.0]
+----
+Toma de muestras
+~2021-12-12
+~ciencias
+~[]
