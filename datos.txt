@@ -26,7 +26,7 @@ torres@gmail.com
 Recoleccion de zetas
 ~2024-11-22 00:00:00
 ~micologia
-~[3, 5]
+~[3, 5, 12.0]
 ----
 Revision de crecimiento
 ~2024-11-27 00:00:00

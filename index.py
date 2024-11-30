@@ -344,7 +344,7 @@ def main(data: Datos):
             pass
         elif opcion == "4":
             # Análisis de resultados
-            analizisResultados(data)
+            analizisResultados(data.experimentos)
             pass
         elif opcion == "5":
             # Generar informe
@@ -462,6 +462,7 @@ def editarExperimentos (data: Datos):
         opcion = int(opcion) - 1
         if opcion < 0:
             break
+        borrarConsola()
         experimentoEscogido = data.experimentos[opcion]
         while experimentoEscogido:
             print(BARSPACE)
@@ -470,11 +471,11 @@ def editarExperimentos (data: Datos):
             opcion = input()
 
             if opcion == "1": # Editar resultado
-                editarResultado(data.experimentos)
+                editarResultado(experimentoEscogido)
             elif opcion == "2": # Editar nombre
-                editarNombreExperimento(data.experimentos)
+                editarNombreExperimento(experimentoEscogido)
             elif opcion == "3": # Editar tipo de ressultado
-                editarTipoExperimento(data.experimentos)
+                editarTipoExperimento(experimentoEscogido)
             elif opcion == "4": # Menu principal
                 break
             else:
@@ -489,7 +490,7 @@ def editarResultado (experimento: Experimento):
         print("¿Que desea hacer?")
         print("1. Borrar entradas")
         print("2. Agregar entrada")
-        print("3. Salir")
+        print("3. Volver")
         respuesta = input(SELECT)
         if respuesta == "1":
             print("¿Cual entrada desea borrar?")
@@ -510,6 +511,10 @@ def editarResultado (experimento: Experimento):
                 print("Datos ingresados con exito !!")
             else:
                 print(BAD_INFO_REQUEST)
+        if respuesta == "3":
+            break
+        else:
+            print(BAD_OPTION)
 # Editar nombre de experimento
 
 def editarNombreExperimento (experimento: Experimento):
