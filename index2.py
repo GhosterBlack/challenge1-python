@@ -35,11 +35,12 @@ MENU_PRINCIPAL = """
 Menu principal
 1. Agregar experimento
 2. Ver experimentos
-3. Análisis de resultados
-4. Generar informe
-5. Configuración
-6. Cerrar sesión
-7. Salir
+3. Editar experimentos
+4. Análisis de resultados
+5. Generar informe
+6. Configuración
+7. Cerrar sesión
+8. Salir
 """
 
 MENU_VER_EXPERIMENTOS = """
@@ -49,6 +50,14 @@ MENU_VER_EXPERIMENTOS = """
 3. Ordenar Experimentos
 4. Filtrar por Tipo de Experimento
 5. Volver al Menú Principal
+"""
+
+MENU_EDITAR_EXPERIMENTOS = """
+--- Editar Experimentos ---
+1. Agregar resultados
+2. Editar resultados
+3. Eliminar resultados
+4. Volver al Menú Principal
 """
 
 GENERAR_INFORME = """
@@ -334,18 +343,22 @@ def main(data: Datos):
         elif opcion == "2":
             verExperimentos(data)  # Ver experimentos
         elif opcion == "3":
+            # Editar experimentos
+            editarExperimentos(data)
+            pass
+        elif opcion == "4":
             # Análisis de resultados
             analizisResultados(data)
             pass
-        elif opcion == "4":
+        elif opcion == "5":
             # Generar informe
             generarInforme(data)
             pass
-        elif opcion == "5":
+        elif opcion == "6":
             # Configuración
             configuracion(data)
             pass
-        elif opcion == "6":
+        elif opcion == "7":
             # Cerrar sesión
             if data.usuario is not None:
                 if sistema.cerrarSesion():  # Llamamos a la función cerrarSesion
@@ -354,7 +367,7 @@ def main(data: Datos):
             else:
                 print("No hay sesión activa.")
                 input("Presione enter para continuar...")
-        elif opcion == "7":
+        elif opcion == "8":
             print("Saliendo del programa...")
             data.guardar()  # Guardamos los datos antes de salir
             break
@@ -443,6 +456,22 @@ def verExperimentos(data: Datos):
             print(BAD_OPTION)
 
 # Opcion 3
+def editarExperimentos (data: Datos):
+    while True:
+        borrarConsola()
+        print(MENU_EDITAR_EXPERIMENTOS)
+        opcion = input(SELECT)
+
+        if opcion == "1":
+                
+            pass
+        elif opcion == "2":
+            pass
+        elif opcion == "3":
+            pass
+        elif opcion == "4":
+            pass
+# Opcion 4
 def analizisResultados (experimentos: list[Experimento]):
     # variables
     listaExperimentosAnalizar: list[Experimento] = []
@@ -534,7 +563,7 @@ def calcularMinimo (experimentos: list[Experimento]):
     print(f"El numero minimo de los resultados entre los experimentos analizados es {resultado} del experimento {experimentos[indexResultado].nombre}")
 
 
-# Opcion 4
+# Opcion 5
 def generarInforme (datos: Datos):
     # esta variable esta definida fuera del while para que las diferentes ciclos de este no la alteren
     # Es basicamente la lista que controla que experimentos iran en el informe si esta vacia todos los experimentos
@@ -629,7 +658,7 @@ def mostrarExperimentos (experimentos: list[Experimento]):
         print(f"{i+1}. {experimento.nombre} - {experimento.tipo}")
     pass
 
-# Opcion 5
+# Opcion 6
 def configuracion (usuario, datos: Datos):
     borrarConsola()
     def optionExport ():
