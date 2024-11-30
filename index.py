@@ -55,6 +55,8 @@ MENU_VER_EXPERIMENTOS = """
 MENU_EDITAR_EXPERIMENTOS = """
 --- Editar Experimentos ---
 1. Editar resultados
+2. Editar nombre
+3. Editar tipo
 2. Volver al Menú Principal
 """
 
@@ -452,20 +454,27 @@ def verExperimentos(data: Datos):
 # Opcion 3
 def editarExperimentos (data: Datos):
     while True:
-        print(BARSPACE)
-        print(MENU_EDITAR_EXPERIMENTOS)
-        print(BARSPACE)
-        opcion = input
+        mostrarExperimentos(data.experimentos)
+        print("Escoja el experimento a editar")
+        opcion = input()
+        opcion = int(opcion) - 1
+        experimentoEscogido = data.experimentos[opcion]
+        while experimentoEscogido:
+            print(BARSPACE)
+            print(MENU_EDITAR_EXPERIMENTOS)
+            print(BARSPACE)
+            opcion = input()
 
-        if opcion == "1": # Editar resultado
-            editarResultado()
-            pass
-        elif opcion == "2": # Menu principal
-            return main()
-            pass
-        else:
-            print(BAD_INFO_REQUEST)
-            pass
+            if opcion == "1": # Editar resultado
+                editarResultado(data.experimentos)
+            elif opcion == "2": # Editar nombre
+                editarNombreExperimento(data.experimentos)
+            elif opcion == "3": # Editar tipo de ressultado
+                editarTipoExperimento(data.experimentos)
+            elif opcion == "4": # Menu principal
+                break
+            else:
+                print(BAD_INFO_REQUEST)
 
 # esta es la parte de editar experimentos
 
@@ -497,25 +506,32 @@ def editarResultado (experimento: Experimento):
                 print("Datos ingresados con exito !!")
             else:
                 print(BAD_INFO_REQUEST)
-    pass
+# Editar nombre de experimento
+
+def editarNombreExperimento (experimento: Experimento):
+    while True:
+        nuevoNombre = input("Ingrese el nuevo nombre de su experimento: ")
+        
+        if len(nuevoNombre) > 3:
+            experimento.nombre = nuevoNombre
+            break
+        else:
+            print("Ingrese mas de 3 caracteres")
+            continue
+
+# Editar tipo de experimento
+def editarTipoExperimento (experimento: Experimento):
+    while True:
+        nuevoTipo = input("Ingrese el nuevo tipo de su experimento: ")
+        
+        if len(nuevoTipo) > 3:
+            experimento.tipo = nuevoTipo
+            break
+        else:
+            print("Ingrese mas de 3 caracteres")
+            continue
 
 # Opcion 4
-def editarExperimentos (data: Datos):
-    while True:
-        borrarConsola()
-        print(MENU_EDITAR_EXPERIMENTOS)
-        opcion = input(SELECT)
-
-        if opcion == "1":
-                
-            pass
-        elif opcion == "2":
-            pass
-        elif opcion == "3":
-            pass
-        elif opcion == "4":
-            pass
-# Opcion 5
 def analizisResultados (experimentos: list[Experimento]):
     # variables
     listaExperimentosAnalizar: list[Experimento] = []
