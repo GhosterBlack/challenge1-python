@@ -57,7 +57,7 @@ MENU_EDITAR_EXPERIMENTOS = """
 1. Editar resultados
 2. Editar nombre
 3. Editar tipo
-2. Volver al Menú Principal
+4. Volver al Menú Principal
 """
 
 GENERAR_INFORME = """
@@ -454,10 +454,14 @@ def verExperimentos(data: Datos):
 # Opcion 3
 def editarExperimentos (data: Datos):
     while True:
+        borrarConsola()
         mostrarExperimentos(data.experimentos)
         print("Escoja el experimento a editar")
+        print("Ingrese 0 para volver al menu principal")
         opcion = input()
         opcion = int(opcion) - 1
+        if opcion < 0:
+            break
         experimentoEscogido = data.experimentos[opcion]
         while experimentoEscogido:
             print(BARSPACE)
