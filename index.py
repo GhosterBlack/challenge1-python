@@ -81,12 +81,20 @@ class Experimento:
     resultados: list[float] = []
 
     def promedio(self):
-        return sum(self.resultados) / len(self.resultados)
+        suma = sum(self.resultados)
+        length = len(self.resultados)
+        if length == 0 or suma == 0:
+            return 0
+        return suma / length
 
     def minimo(self):
+        if len(self.resultados) == 0:
+            return 0
         return min(self.resultados)
 
     def maximo(self):
+        if len(self.resultados) == 0:
+            return 0
         return max(self.resultados)
     
     def __init__(self, nombre, fecha, tipo, resultados = []):
@@ -352,7 +360,7 @@ def main(data: Datos):
             pass
         elif opcion == "6":
             # Configuración
-            configuracion(data)
+            configuracion(data.obtenerUsuario(), data)
             pass
         elif opcion == "7":
             # Cerrar sesión

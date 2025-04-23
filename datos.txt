@@ -22,6 +22,14 @@ torres@gmail.com
 ~3124567890
 ~Gustavo
 ~Torres
+----
+ivan.look3002@gmail.com
+~15e2b0d3c33891ebb0f1ef609ec419420c20e320ce94c65fbc8c3312448eb225
+~Exportacion de datos (Ivan)
+~
+~3122003538
+~Ivan
+~Torres
 ####
 Recoleccion de zetas
 ~2024-11-22 00:00:00
